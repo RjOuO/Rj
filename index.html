@@ -1,4 +1,116 @@
-  <!-- 角色列（10人） -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>報團表</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f5f5f5;
+    padding: 30px;
+  }
+
+  table {
+    border-collapse: collapse;
+    background: #fff;
+  }
+
+  td, th {
+    border: 2px solid #000;
+    padding: 6px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .title {
+    background: #fff200;
+    font-weight: bold;
+  }
+
+  .header {
+    background: #ffe8b0;
+    font-weight: bold;
+  }
+
+  .dropdown {
+    width: 100%;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: none;
+    background: #e6e6e6;
+    cursor: pointer;
+  }
+
+  .status {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: #0f7a3b;
+    color: #fff;
+    font-size: 13px;
+  }
+
+  input[type="text"] {
+    width: 95%;
+    border: none;
+    outline: none;
+    text-align: center;
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+</style>
+</head>
+<body>
+
+<table>
+  <!-- 第一排 -->
+  <tr>
+    <td class="title">報團時間</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+
+  <!-- 第二排 -->
+  <tr>
+    <td class="header">選擇副本</td>
+    <td class="header">等級</td>
+    <td class="header">隊長ID</td>
+    <td class="header">狀態</td>
+  </tr>
+
+  <!-- 第三排 -->
+  <tr>
+    <td>
+      <select class="dropdown">
+        <option>一般10人饕宴</option>
+        <option>試劍</option>
+        <option>百業10人饕宴</option>
+        <option>百業一般饕宴</option>
+      </select>
+    </td>
+    <td>
+      <select class="dropdown">
+        <option>普通</option>
+        <option>困難</option>
+        <option>挑戰</option>
+      </select>
+    </td>
+    <td><input type="text"></td>
+    <td><span class="status">未滿</span></td>
+  </tr>
+
+  <!-- 角色標頭 -->
+  <tr>
+    <td class="header">角色ID</td>
+    <td class="header">定位</td>
+    <td class="header">DC語音</td>
+    <td class="header">備註</td>
+  </tr>
+
+  <!-- 角色 1 -->
   <tr>
     <td><input type="text"></td>
     <td>
@@ -12,119 +124,79 @@
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 2 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 3 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 4 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 5 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 6 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 7 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 8 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 9 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
 
+  <!-- 角色 10 -->
   <tr>
     <td><input type="text"></td>
-    <td>
-      <select class="dropdown">
-        <option>輸出</option>
-        <option>坦</option>
-        <option>補</option>
-      </select>
-    </td>
+    <td><select class="dropdown"><option>輸出</option><option>坦</option><option>補</option></select></td>
     <td><input type="checkbox"></td>
     <td><input type="text"></td>
   </tr>
+
+</table>
+
+</body>
+</html>
