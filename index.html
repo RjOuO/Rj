@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>下拉標籤選單</title>
+<title>報團表</title>
 <style>
   body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background: #f6f6f6;
-    padding: 40px;
+    background: #f5f5f5;
+    padding: 30px;
   }
 
   table {
@@ -15,61 +15,146 @@
     background: #fff;
   }
 
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
+  td, th {
+    border: 2px solid #000;
+    padding: 6px;
     text-align: center;
-    min-width: 140px;
-  }
-
-  th {
-    background: #ffe9a8;
-  }
-
-  /* 下拉選單本體 */
-  select {
-    width: 140px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid #ccc;
     font-size: 14px;
+  }
+
+  .title {
+    background: #fff200;
+    font-weight: bold;
+  }
+
+  .header {
+    background: #ffe8b0;
+    font-weight: bold;
+  }
+
+  .dropdown {
+    width: 100%;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: none;
+    background: #e6e6e6;
     cursor: pointer;
-    appearance: none;
-    background-repeat: no-repeat;
-    background-position: right 10px center;
   }
 
-  /* 各選項顏色 */
-  option[value="green"] {
-    background: #2ecc71;
+  .status {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: #0f7a3b;
     color: #fff;
+    font-size: 13px;
   }
 
-  option[value="blue"] {
-    background: #3498db;
-    color: #fff;
+  input[type="text"] {
+    width: 95%;
+    border: none;
+    outline: none;
+    text-align: center;
   }
 
-  option[value="brown"] {
-    background: #8e5a2b;
-    color: #fff;
+  input[type="checkbox"] {
+    transform: scale(1.2);
   }
-
-  option[value="red"] {
-    background: #e74c3c;
-    color: #fff;
-  }
-
-  /* 選中後的顏色（JS 會套） */
-  .green { background: #2ecc71; color: #fff; }
-  .blue  { background: #3498db; color: #fff; }
-  .brown { background: #8e5a2b; color: #fff; }
-  .red   { background: #e74c3c; color: #fff; }
 </style>
 </head>
 <body>
 
 <table>
+  <!-- 第一排 -->
   <tr>
-    <th>選擇副本11111</th>
-    <th>等級</th>
+    <td class="title">報團時間</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+
+  <!-- 第二排 -->
+  <tr>
+    <td class="header">選擇副本</td>
+    <td class="header">等級</td>
+    <td class="header">隊長ID</td>
+    <td class="header">狀態</td>
+  </tr>
+
+  <!-- 第三排 -->
+  <tr>
+    <td>
+      <select class="dropdown">
+        <option>一般10人饕宴</option>
+        <option>試劍</option>
+        <option>百業10人饕宴</option>
+        <option>百業一般饕宴</option>
+      </select>
+    </td>
+    <td>
+      <select class="dropdown">
+        <option>普通</option>
+        <option>困難</option>
+        <option>挑戰</option>
+      </select>
+    </td>
+    <td><input type="text"></td>
+    <td><span class="status">未滿</span></td>
+  </tr>
+
+  <!-- 第四排標頭 -->
+  <tr>
+    <td class="header">角色ID</td>
+    <td class="header">定位</td>
+    <td class="header">DC語音</td>
+    <td class="header">備註</td>
+  </tr>
+
+  <!-- 角色列（複製這段可增加人數） -->
+  <!-- 1 -->
+  <tr>
+    <td><input type="text"></td>
+    <td>
+      <select class="dropdown">
+        <option>輸出</option>
+        <option>坦</option>
+        <option>補</option>
+      </select>
+    </td>
+    <td><input type="checkbox"></td>
+    <td><input type="text"></td>
+  </tr>
+
+  <!-- 2 -->
+  <tr>
+    <td><input type="text"></td>
+    <td>
+      <select class="dropdown">
+        <option>輸出</option>
+        <option>坦</option>
+        <option>補</option>
+      </select>
+    </td>
+    <td><input type="checkbox"></td>
+    <td><input type="text"></td>
+  </tr>
+
+  <!-- 3 -->
+  <tr>
+    <td><input type="text"></td>
+    <td>
+      <select class="dropdown">
+        <option>輸出</option>
+        <option>坦</option>
+        <option>補</option>
+      </select>
+    </td>
+    <td><input type="checkbox"></td>
+    <td><input type="text"></td>
+  </tr>
+
+  <!-- 想幾人就複製幾行 -->
+</table>
+
+</body>
+</html>
