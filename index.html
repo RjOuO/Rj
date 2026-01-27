@@ -3,220 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <title>遊戲旅舍報團專用表</title>
+
 <style>
-  body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f5f5f5;
-    padding: 30px;
-  }
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 30px;
+}
 
-  .scale-wrapper {
-    transform: scale(1.0);
-    transform-origin: top left;
-  }
+table {
+  border-collapse: collapse;
+  background: #fff;
+}
 
-  table {
-    border-collapse: collapse;
-    background: #fff;
-  }
+td, th {
+  border: 2px solid #000;
+  padding: 6px;
+  text-align: center;
+  font-size: 18px;
+  vertical-align: middle;
+}
 
-  td, th {
-    border: 2px solid #000;
-    padding: 6px;
-    text-align: center;
-    font-size: 14px;
-  }
+.title { background: #fff200; font-weight: bold; }
+.header { background: #ffe8b0; font-weight: bold; }
+.gray-cell { background: #e0e0e0; font-weight: bold; }
 
-  .title {
-    background: #fff200;
-    font-weight: bold;
-  }
+.dropdown {
+  width: 100%;
+  border-radius: 999px;
+  padding: 4px 20px;
+  border: none;
+  cursor: pointer;
+}
 
-  .header {
-    background: #ffe8b0;
-    font-weight: bold;
-  }
+/* input / select 置中 */
+td > select,
+td > input[type="text"],
+td > input[type="date"],
+td > input[type="time"] {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+}
 
-  .dropdown {
-    width: 100%;
-    border-radius: 999px;
-    padding: 4px 10px;
-    border: none;
-    background: #e6e6e6;
-    cursor: pointer;
-    color: #000;
-  }
+select {
+  text-align-last: center;
+}
 
-  /* ===== 副本顏色 ===== */
-  .instance-empty { background: #e6e6e6; color: #000; }
-  .instance-normal { background: #c8f0c2; color: #000; }   /* 淺綠 */
-  .instance-trial  { background: #4da3ff; color: #fff; }   /* 藍 */
-  .instance-guild  { background: #5a3a1a; color: #fff; }   /* 深咖啡 */
-  .instance-mix    { background: #b22222; color: #fff; }   /* 蠟燭紅 */
+/* 副本顏色（選取後） */
+.instance-empty { background: #e6e6e6; }
+.instance-normal { background: #c8f0c2; }
+.instance-trial { background: #4da3ff; color: #fff; }
+.instance-guild { background: #5a3a1a; color: #fff; }
+.instance-mix { background: #b22222; color: #fff; }
 
-  /* ===== 狀態下拉顏色 ===== */
-  .status-empty { background: #e6e6e6; color: #000; }
-  .status-open  { background: #1e8f4a; color: #fff; }
-  .status-full  { background: #c0392b; color: #fff; }
-  .status-done  { background: #000; color: #fff; }
+/* 副本 option 底色 */
+#instanceSelect option:nth-child(1) { background-color: #ffffff; }
+#instanceSelect option:nth-child(2) { background-color: #c8f0c2; }
+#instanceSelect option:nth-child(3) { background-color: #4da3ff; color: #fff; }
+#instanceSelect option:nth-child(4) { background-color: #5a3a1a; color: #fff; }
+#instanceSelect option:nth-child(5) { background-color: #b22222; color: #fff; }
 
-  /* ===== 角色區狀態底色 ===== */
-  .role-full td {
-    background: #7a1f1f;
-    color: #fff;
-  }
+/* 狀態顏色（選取後） */
+.status-empty { background: #e6e6e6; }
+.status-open { background: #1e8f4a; color: #fff; }
+.status-full { background: #c0392b; color: #fff; }
+.status-done { background: #000; color: #fff; }
 
-  .role-done td {
-    background: #4a4a4a;
-    color: #fff;
-  }
+/* ⭐ 狀態下拉式選單 option 底色（新增） */
+#statusSelect option:nth-child(1) { background-color: #ffffff; }
+#statusSelect option:nth-child(2) { background-color: #1e8f4a; color: #fff; } /* 未滿 */
+#statusSelect option:nth-child(3) { background-color: #c0392b; color: #fff; } /* 滿團 */
+#statusSelect option:nth-child(4) { background-color: #000000; color: #fff; } /* 完成 */
 
-  .gray-cell {
-    background: #e0e0e0;
-  }
+/* 角色狀態 */
+.role-full td { background: #7a1f1f; color: #fff; }
+.role-done td { background: #4a4a4a; color: #fff; }
 
-  input[type="text"],
-  input[type="date"],
-  input[type="time"] {
-    width: 95%;
-    border: none;
-    outline: none;
-    text-align: center;
-    background: transparent;
-    color: inherit;
-  }
+/* 試劍鎖定 */
+.trial-locked td {
+  background: #000 !important;
+  color: #fff !important;
+}
 
-  input[type="checkbox"] {
-    transform: scale(1.2);
-  }
+input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+}
+
+.reset-btn {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #444;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* 定位 option 底色 */
+.role-row select option:nth-child(1) { background-color: #ffffff; }
+.role-row select option:nth-child(2) { background-color: #f6c1c1; }
+.role-row select option:nth-child(3) { background-color: #cdeecb; }
+.role-row select option:nth-child(4) { background-color: #cfe8ff; }
+.role-row select option:nth-child(5) { background-color: #e3d4f3; }
+.role-row select option:nth-child(6) { background-color: #e6e6e6; }
+
+/* 定位欄位顯示底色 */
+.role-cell-empty { background: #ffffff; }
+.role-cell-tank { background: #f6c1c1; }
+.role-cell-heal { background: #cdeecb; }
+.role-cell-dps { background: #cfe8ff; }
+.role-cell-ht { background: #e3d4f3; }
+.role-cell-dh { background: #e6e6e6; }
 </style>
 </head>
+
 <body>
 
-<div class="scale-wrapper">
 <table>
 
-  <!-- 報團時間 -->
-  <tr>
-    <td class="title">報團時間</td>
-    <td><input type="date" id="groupDate"></td>
-    <td class="gray-cell"></td>
-    <td><input type="time" id="groupTime"></td>
-  </tr>
+<tr>
+  <td colspan="4">
+    <button class="reset-btn" onclick="confirmReset()">一鍵清除</button>
+  </td>
+</tr>
 
-  <!-- 表頭 -->
-  <tr>
-    <td class="header">選擇副本</td>
-    <td class="header">等級</td>
-    <td class="header">隊長ID</td>
-    <td class="header">狀態</td>
-  </tr>
+<tr>
+  <td class="title">報團時間</td>
+  <td><input type="date" id="groupDate"></td>
+  <td class="gray-cell" id="weekdayCell"></td>
+  <td><input type="time" id="groupTime"></td>
+</tr>
 
-  <!-- 基本資訊 -->
-  <tr>
-    <td>
-      <select id="instanceSelect" class="dropdown instance-empty">
-        <option value=""></option>
-        <option value="normal">一般10人俠境</option>
-        <option value="trial">試劍</option>
-        <option value="guild">百業10人俠境</option>
-        <option value="mix">百業+一般俠境</option>
-      </select>
-    </td>
-    <td>
-      <select class="dropdown">
-        <option value=""></option>
-        <option>56</option>
-        <option>61</option>
-        <option>66</option>
-        <option>71</option>
-      </select>
-    </td>
-    <td><input type="text"></td>
-    <td>
-      <select id="statusSelect" class="dropdown status-empty">
-        <option value=""></option>
-        <option value="open">未滿</option>
-        <option value="full">滿團</option>
-        <option value="done">完成</option>
-      </select>
-    </td>
-  </tr>
+<tr>
+  <td class="header">選擇副本</td>
+  <td class="header">等級</td>
+  <td class="header">隊長ID</td>
+  <td class="header">狀態</td>
+</tr>
 
-  <!-- 角色表頭 -->
-  <tr>
-    <td class="header">角色ID</td>
-    <td class="header">定位</td>
-    <td class="header">DC語音</td>
-    <td class="header">備註</td>
-  </tr>
+<tr>
+  <td>
+    <select id="instanceSelect" class="dropdown instance-empty">
+      <option value=""></option>
+      <option value="normal">一般10人俠境</option>
+      <option value="trial">試劍</option>
+      <option value="guild">百業10人俠境</option>
+      <option value="mix">百業+一般俠境</option>
+    </select>
+  </td>
+  <td>
+    <select id="levelSelect" class="dropdown">
+      <option></option>
+      <option>56</option>
+      <option>61</option>
+      <option>66</option>
+      <option>71</option>
+    </select>
+  </td>
+  <td><input type="text" id="leaderId"></td>
+  <td>
+    <select id="statusSelect" class="dropdown status-empty">
+      <option></option>
+      <option value="open">未滿</option>
+      <option value="full">滿團</option>
+      <option value="done">完成</option>
+    </select>
+  </td>
+</tr>
 
-  <!-- 角色 1～10 -->
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-  <tr class="role-row"><td><input></td><td><select class="dropdown"><option value=""></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td><td><input type="checkbox"></td><td><input></td></tr>
-
-</table>
-</div>
+<tr>
+  <td class="header">角色ID</td>
+  <td class="header">定位</td>
+  <td class="header">DC語音</td>
+  <td class="header">備註</td>
+</tr>
 
 <script>
-  // 日期時間
-  const now = new Date();
-  document.getElementById("groupDate").value = now.toISOString().split("T")[0];
-  document.getElementById("groupTime").value =
-    String(now.getHours()).padStart(2,"0") + ":" +
-    String(now.getMinutes()).padStart(2,"0");
+for (let i = 0; i < 10; i++) {
+  document.write(`
+  <tr class="role-row">
+    <td><input></td>
+    <td>
+      <select class="dropdown">
+        <option></option>
+        <option>坦</option>
+        <option>全奶</option>
+        <option>輸出</option>
+        <option>奶坦</option>
+        <option>輸出奶</option>
+      </select>
+    </td>
+    <td><input type="checkbox"></td>
+    <td><input></td>
+  </tr>`);
+}
+</script>
 
-  // 副本顏色切換
-  const instanceSelect = document.getElementById("instanceSelect");
-  instanceSelect.addEventListener("change", () => {
-    instanceSelect.classList.remove(
-      "instance-empty","instance-normal","instance-trial","instance-guild","instance-mix"
-    );
+</table>
 
-    if (instanceSelect.value === "normal") {
-      instanceSelect.classList.add("instance-normal");
-    } else if (instanceSelect.value === "trial") {
-      instanceSelect.classList.add("instance-trial");
-    } else if (instanceSelect.value === "guild") {
-      instanceSelect.classList.add("instance-guild");
-    } else if (instanceSelect.value === "mix") {
-      instanceSelect.classList.add("instance-mix");
-    } else {
-      instanceSelect.classList.add("instance-empty");
+<script>
+const groupDate = document.getElementById("groupDate");
+const groupTime = document.getElementById("groupTime");
+const weekdayCell = document.getElementById("weekdayCell");
+const instanceSelect = document.getElementById("instanceSelect");
+const statusSelect = document.getElementById("statusSelect");
+const roleRows = document.querySelectorAll(".role-row");
+const leaderId = document.getElementById("leaderId");
+const levelSelect = document.getElementById("levelSelect");
+
+const weekdays = ["日","一","二","三","四","五","六"];
+
+function updateWeekday() {
+  if (!groupDate.value) {
+    weekdayCell.textContent = "";
+    return;
+  }
+  const d = new Date(groupDate.value);
+  weekdayCell.textContent = "星期" + weekdays[d.getDay()];
+}
+
+function setNow() {
+  const n = new Date();
+  groupDate.value = n.toISOString().split("T")[0];
+  groupTime.value =
+    String(n.getHours()).padStart(2,"0") + ":" +
+    String(n.getMinutes()).padStart(2,"0");
+  updateWeekday();
+}
+
+function confirmReset() {
+  if (confirm("確定要清除目前表格內容嗎？")) resetForm();
+}
+
+function resetForm() {
+  setNow();
+  instanceSelect.value = "";
+  statusSelect.value = "";
+  instanceSelect.className = "dropdown instance-empty";
+  statusSelect.className = "dropdown status-empty";
+  leaderId.value = "";
+  levelSelect.value = "";
+
+  roleRows.forEach(row => {
+    row.className = "role-row";
+    row.querySelectorAll("input,select").forEach(el => {
+      el.disabled = false;
+      el.type === "checkbox" ? el.checked = false : el.value = "";
+    });
+  });
+}
+
+groupDate.addEventListener("change", updateWeekday);
+
+instanceSelect.addEventListener("change", () => {
+  instanceSelect.className = "dropdown instance-" + instanceSelect.value;
+
+  roleRows.forEach((row, i) => {
+    row.classList.remove("trial-locked");
+    row.querySelectorAll("input,select").forEach(el => el.disabled = false);
+
+    if (instanceSelect.value === "trial" && i >= 5) {
+      row.classList.add("trial-locked");
+      row.querySelectorAll("input,select").forEach(el => {
+        el.type === "checkbox" ? el.checked = false : el.value = "";
+        el.disabled = true;
+      });
     }
   });
+});
 
-  // 狀態控制
-  const statusSelect = document.getElementById("statusSelect");
-  const roleRows = document.querySelectorAll(".role-row");
+statusSelect.addEventListener("change", () => {
+  statusSelect.className = "dropdown status-" + statusSelect.value;
+  roleRows.forEach(row => {
+    row.classList.remove("role-full","role-done");
+    if (statusSelect.value === "full") row.classList.add("role-full");
+    if (statusSelect.value === "done") row.classList.add("role-done");
+  });
+});
 
-  statusSelect.addEventListener("change", () => {
-    statusSelect.classList.remove(
-      "status-empty","status-open","status-full","status-done"
-    );
-
-    roleRows.forEach(row => row.classList.remove("role-full","role-done"));
-
-    if (statusSelect.value === "open") {
-      statusSelect.classList.add("status-open");
-    } else if (statusSelect.value === "full") {
-      statusSelect.classList.add("status-full");
-      roleRows.forEach(row => row.classList.add("role-full"));
-    } else if (statusSelect.value === "done") {
-      statusSelect.classList.add("status-done");
-      roleRows.forEach(row => row.classList.add("role-done"));
-    } else {
-      statusSelect.classList.add("status-empty");
+document.querySelectorAll(".role-row select").forEach(select => {
+  const td = select.parentElement;
+  select.addEventListener("change", () => {
+    td.className = "";
+    switch (select.value) {
+      case "坦": td.classList.add("role-cell-tank"); break;
+      case "全奶": td.classList.add("role-cell-heal"); break;
+      case "輸出": td.classList.add("role-cell-dps"); break;
+      case "奶坦": td.classList.add("role-cell-ht"); break;
+      case "輸出奶": td.classList.add("role-cell-dh"); break;
+      default: td.classList.add("role-cell-empty");
     }
   });
+});
+
+setNow();
 </script>
 
 </body>
