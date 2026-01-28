@@ -115,13 +115,15 @@ document.write(`
 </table>
 
 <script>
+/* ===== 全域 ===== */
 window.isSyncApplying=false;
 let countdownTimer=null;
 let countdownInterval=null;
 let countdownSec=0;
 
-/* ★ 完成後自動清除 */
+/* ★ 完成自動清除控制 */
 let doneAutoResetTimer=null;
+let localDoneTriggered=false;
 
 const groupDate=document.getElementById("groupDate");
 const weekdayCell=document.getElementById("weekdayCell");
@@ -144,7 +146,7 @@ function isAllRoleFilled(){
   });
 }
 
-/* ===== 原滿團倒數（不動） ===== */
+/* ===== 原本滿團倒數（不動） ===== */
 function startCountdown(){
   if(countdownInterval || statusSelect.value!=="open") return;
 
@@ -177,12 +179,14 @@ function stopCountdown(){
   statusSelect.options[0].text="未滿";
 }
 
-/* ★ 不跳確認的一鍵清除 */
+/* ★ 不跳確認的一鍵清除（給自動用） */
 function silentReset(){
   window.isSyncApplying=true;
+
   stopCountdown();
   clearTimeout(doneAutoResetTimer);
   doneAutoResetTimer=null;
+  localDoneTriggered=false;
 
   document.querySelectorAll("input,select").forEach(el=>{
     el.type==="checkbox"?el.checked=false:el.value="";
@@ -193,6 +197,7 @@ function silentReset(){
   updateWeekday();
   applyRules();
   pushToCloud();
+
   window.isSyncApplying=false;
 }
 
@@ -254,6 +259,7 @@ statusSelect.addEventListener("change",()=>{
   applyRules();
 
   if(statusSelect.value==="done"){
+    localDoneTriggered=true;
     doneAutoResetTimer=setTimeout(()=>{
       silentReset();
     },10000);
@@ -310,9 +316,14 @@ ref.on("value",snap=>{
   if(!snap.val())return;
   isRemote=true;
   window.isSyncApplying=true;
+
+  /* ★ 關鍵：本地完成倒數中，不清 timer */
+  if(!localDoneTriggered){
+    clearTimeout(doneAutoResetTimer);
+    doneAutoResetTimer=null;
+  }
+
   stopCountdown();
-  clearTimeout(doneAutoResetTimer);
-  doneAutoResetTimer=null;
 
   const data=snap.val().data;
   document.querySelectorAll("input,select").forEach((el,i)=>{
