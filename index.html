@@ -5,65 +5,35 @@
 <title>遊戲旅舍報團專用表</title>
 
 <style>
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 30px;
-}
-table { border-collapse: collapse; background: #fff; }
-td, th {
-  border: 2px solid #000;
-  padding: 6px;
-  text-align: center;
-  font-size: 18px;
-}
-.title { background: #fff200; font-weight: bold; }
-.header { background: #ffe8b0; font-weight: bold; }
-.gray-cell { background: #e0e0e0; font-weight: bold; }
-
-.dropdown {
-  width: 100%;
-  border-radius: 999px;
-  padding: 4px 20px;
-  border: none;
-}
-
-select { text-align-last: center; }
-
-.instance-empty { background: #e6e6e6; }
-.instance-normal { background: #c8f0c2; }
-.instance-trial { background: #4da3ff; color:#fff; }
-.instance-guild { background: #5a3a1a; color:#fff; }
-.instance-mix { background: #b22222; color:#fff; }
-
-.status-empty { background:#e6e6e6; }
-.status-open { background:#1e8f4a; color:#fff; }
-.status-full { background:#7a1f1f; color:#fff; }
-.status-done { background:#000; color:#fff; }
-
-.role-full td { background:#7a1f1f; color:#fff; }
-.role-done td { background:#4a4a4a; color:#fff; }
-
-.trial-locked td { background:#000!important; color:#fff!important; }
-
-input { border:none; background:transparent; }
-input[type="checkbox"] { transform: scale(1.2); }
-
-.reset-btn {
-  padding: 8px 20px;
-  border-radius: 999px;
-  border: none;
-  background: #444;
-  color: #fff;
-  cursor: pointer;
-}
-
-.role-cell-tank { background:#f6c1c1; }
-.role-cell-heal { background:#cdeecb; }
-.role-cell-dps { background:#cfe8ff; }
-.role-cell-ht { background:#e3d4f3; }
-.role-cell-dh { background:#e6e6e6; }
-.role-cell-empty { background:#fff; }
+body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
+table{border-collapse:collapse;background:#fff}
+td,th{border:2px solid #000;padding:6px;text-align:center;font-size:18px}
+.title{background:#fff200;font-weight:bold}
+.header{background:#ffe8b0;font-weight:bold}
+.gray-cell{background:#e0e0e0;font-weight:bold}
+.dropdown{width:100%;border-radius:999px;padding:4px 20px;border:none}
+select{text-align-last:center}
+.instance-empty{background:#e6e6e6}
+.instance-normal{background:#c8f0c2}
+.instance-trial{background:#4da3ff;color:#fff}
+.instance-guild{background:#5a3a1a;color:#fff}
+.instance-mix{background:#b22222;color:#fff}
+.status-empty{background:#e6e6e6}
+.status-open{background:#1e8f4a;color:#fff}
+.status-full{background:#7a1f1f;color:#fff}
+.status-done{background:#000;color:#fff}
+.role-full td{background:#7a1f1f;color:#fff}
+.role-done td{background:#4a4a4a;color:#fff}
+.trial-locked td{background:#000!important;color:#fff!important}
+input{border:none;background:transparent}
+input[type="checkbox"]{transform:scale(1.2)}
+.reset-btn{padding:8px 20px;border-radius:999px;border:none;background:#444;color:#fff;cursor:pointer}
+.role-cell-tank{background:#f6c1c1}
+.role-cell-heal{background:#cdeecb}
+.role-cell-dps{background:#cfe8ff}
+.role-cell-ht{background:#e3d4f3}
+.role-cell-dh{background:#e6e6e6}
+.role-cell-empty{background:#fff}
 </style>
 </head>
 
@@ -73,212 +43,178 @@ input[type="checkbox"] { transform: scale(1.2); }
 <tr><td colspan="4"><button class="reset-btn" onclick="confirmReset()">一鍵清除</button></td></tr>
 
 <tr>
-  <td class="title">報團時間</td>
-  <td><input type="date" id="groupDate"></td>
-  <td class="gray-cell" id="weekdayCell"></td>
-  <td><input type="time" id="groupTime"></td>
+<td class="title">報團時間</td>
+<td><input type="date" id="groupDate"></td>
+<td class="gray-cell" id="weekdayCell"></td>
+<td><input type="time" id="groupTime"></td>
 </tr>
 
 <tr>
-  <td class="header">選擇副本</td>
-  <td class="header">等級</td>
-  <td class="header">隊長ID</td>
-  <td class="header">狀態</td>
+<td class="header">選擇副本</td>
+<td class="header">等級</td>
+<td class="header">隊長ID</td>
+<td class="header">狀態</td>
 </tr>
 
 <tr>
-  <td>
-    <select id="instanceSelect" class="dropdown instance-empty">
-      <option value=""></option>
-      <option value="normal">一般10人俠境</option>
-      <option value="trial">試劍</option>
-      <option value="guild">百業10人俠境</option>
-      <option value="mix">百業+一般俠境</option>
-    </select>
-  </td>
-  <td>
-    <select id="levelSelect" class="dropdown">
-      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
-    </select>
-  </td>
-  <td><input id="leaderId"></td>
-  <td>
-    <select id="statusSelect" class="dropdown status-empty">
-      <option></option><option value="open">未滿</option><option value="full">滿團</option><option value="done">完成</option>
-    </select>
-  </td>
+<td>
+<select id="instanceSelect" class="dropdown instance-empty">
+<option value=""></option>
+<option value="normal">一般10人俠境</option>
+<option value="trial">試劍</option>
+<option value="guild">百業10人俠境</option>
+<option value="mix">百業+一般俠境</option>
+</select>
+</td>
+<td>
+<select id="levelSelect" class="dropdown">
+<option></option><option>56</option><option>61</option><option>66</option><option>71</option>
+</select>
+</td>
+<td><input id="leaderId"></td>
+<td>
+<select id="statusSelect" class="dropdown status-empty">
+<option></option>
+<option value="open">未滿</option>
+<option value="full">滿團</option>
+<option value="done">完成</option>
+</select>
+</td>
 </tr>
 
 <tr>
-  <td class="header">角色ID</td>
-  <td class="header">定位</td>
-  <td class="header">DC語音</td>
-  <td class="header">備註</td>
+<td class="header">角色ID</td>
+<td class="header">定位</td>
+<td class="header">DC語音</td>
+<td class="header">備註</td>
 </tr>
 
 <script>
-for (let i=0;i<10;i++){
+for(let i=0;i<10;i++){
 document.write(`
 <tr class="role-row">
 <td><input></td>
 <td>
 <select class="dropdown">
-<option></option>
-<option>坦</option>
-<option>全奶</option>
-<option>輸出</option>
-<option>奶坦</option>
-<option>輸出奶</option>
+<option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option>
 </select>
 </td>
 <td><input type="checkbox"></td>
 <td><input></td>
-</tr>`);
+</tr>`)
 }
 </script>
 </table>
 
 <script>
-/* ===== v1.0 原始邏輯 + 同步防護 ===== */
-window.isSyncApplying = false;
+/* ===== 全域 ===== */
+window.isSyncApplying=false
+const instanceSelect=document.getElementById("instanceSelect")
+const statusSelect=document.getElementById("statusSelect")
+const roleRows=document.querySelectorAll(".role-row")
 
-const groupDate = document.getElementById("groupDate");
-const groupTime = document.getElementById("groupTime");
-const weekdayCell = document.getElementById("weekdayCell");
-const instanceSelect = document.getElementById("instanceSelect");
-const statusSelect = document.getElementById("statusSelect");
-const roleRows = document.querySelectorAll(".role-row");
-const weekdays = ["日","一","二","三","四","五","六"];
+function applyRules(){
+/* 副本顏色 */
+instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty")
 
-function updateWeekday(){
-  if(!groupDate.value){weekdayCell.textContent="";return;}
-  const d=new Date(groupDate.value);
-  weekdayCell.textContent="星期"+weekdays[d.getDay()];
+/* 試劍鎖排 */
+roleRows.forEach((row,i)=>{
+row.classList.remove("trial-locked")
+row.querySelectorAll("input,select").forEach(el=>el.disabled=false)
+if(instanceSelect.value==="trial"&&i>=5){
+row.classList.add("trial-locked")
+row.querySelectorAll("input,select").forEach(el=>{
+el.type==="checkbox"?el.checked=false:el.value=""
+el.disabled=true
+})
+}
+})
+
+/* 狀態顏色 */
+statusSelect.className="dropdown status-"+(statusSelect.value||"empty")
+roleRows.forEach(row=>{
+row.classList.remove("role-full","role-done")
+if(statusSelect.value==="full")row.classList.add("role-full")
+if(statusSelect.value==="done")row.classList.add("role-done")
+})
+
+/* 定位顏色 */
+roleRows.forEach(row=>{
+const sel=row.querySelector("select")
+const td=sel.parentElement
+td.className=""
+const map={
+"坦":"role-cell-tank",
+"全奶":"role-cell-heal",
+"輸出":"role-cell-dps",
+"奶坦":"role-cell-ht",
+"輸出奶":"role-cell-dh"
+}
+td.classList.add(map[sel.value]||"role-cell-empty")
+})
 }
 
-function setNow(){
-  const n=new Date();
-  groupDate.value=n.toISOString().split("T")[0];
-  groupTime.value=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
-  updateWeekday();
-}
+instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules()})
+statusSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules()})
+document.querySelectorAll(".role-row select").forEach(s=>{
+s.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules()})
+})
 
 function confirmReset(){
-  if(confirm("確定要清除目前表格內容嗎？")) resetForm();
+if(!confirm("確定要清除目前表格內容嗎？"))return
+window.isSyncApplying=true
+document.querySelectorAll("input,select").forEach(el=>{
+el.type==="checkbox"?el.checked=false:el.value=""
+el.disabled=false
+})
+instanceSelect.value=""
+statusSelect.value=""
+applyRules()
+pushToCloud()
+window.isSyncApplying=false
 }
-
-function resetForm(){
-  setNow();
-  instanceSelect.value="";
-  statusSelect.value="";
-  instanceSelect.className="dropdown instance-empty";
-  statusSelect.className="dropdown status-empty";
-
-  roleRows.forEach(r=>{
-    r.className="role-row";
-    r.querySelectorAll("input,select").forEach(el=>{
-      el.disabled=false;
-      el.type==="checkbox"?el.checked=false:el.value="";
-    });
-  });
-
-  refreshUI();
-}
-
-groupDate.addEventListener("change", updateWeekday);
-
-instanceSelect.addEventListener("change", ()=>{
-  if(window.isSyncApplying) return;
-  refreshUI();
-});
-
-statusSelect.addEventListener("change", ()=>{
-  if(window.isSyncApplying) return;
-  refreshUI();
-});
-
-document.querySelectorAll(".role-row select").forEach(select=>{
-  select.addEventListener("change", ()=>{
-    if(window.isSyncApplying) return;
-    refreshUI();
-  });
-});
-
-/* ===== 顏色重算核心 ===== */
-function refreshUI(){
-  instanceSelect.className = "dropdown instance-" + (instanceSelect.value || "empty");
-  statusSelect.className = "dropdown status-" + (statusSelect.value || "empty");
-
-  roleRows.forEach(row=>{
-    const select=row.querySelector("select");
-    const td=select.parentElement;
-    td.className="";
-    const map={
-      "坦":"role-cell-tank",
-      "全奶":"role-cell-heal",
-      "輸出":"role-cell-dps",
-      "奶坦":"role-cell-ht",
-      "輸出奶":"role-cell-dh"
-    };
-    td.classList.add(map[select.value] || "role-cell-empty");
-  });
-}
-
-setNow();
 </script>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 firebase.initializeApp({
-  apiKey:"AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
-  authDomain:"rjgame-582d0.firebaseapp.com",
-  databaseURL:"https://rjgame-582d0-default-rtdb.firebaseio.com",
-  projectId:"rjgame-582d0"
-});
+apiKey:"AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
+authDomain:"rjgame-582d0.firebaseapp.com",
+databaseURL:"https://rjgame-582d0-default-rtdb.firebaseio.com",
+projectId:"rjgame-582d0"
+})
 </script>
 
 <script>
-/* ===== Cloud Sync Module（最終穩定版） ===== */
-(function(){
-  const ref = firebase.database().ref("tables/gameinn-main");
-  let isApplyingRemote=false;
+const ref=firebase.database().ref("tables/gameinn-main")
+let isRemote=false
 
-  function collect(){
-    return [...document.querySelectorAll("input,select")].map(el =>
-      el.type==="checkbox"?el.checked:el.value
-    );
-  }
+function collect(){
+return [...document.querySelectorAll("input,select")].map(el=>el.type==="checkbox"?el.checked:el.value)
+}
 
-  function apply(data){
-    [...document.querySelectorAll("input,select")].forEach((el,i)=>{
-      if(data[i]===undefined) return;
-      el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
-    });
-  }
+function pushToCloud(){
+if(isRemote)return
+ref.set({data:collect(),updatedAt:Date.now()})
+}
 
-  ref.on("value", snap=>{
-    if(!snap.val()) return;
+ref.on("value",snap=>{
+if(!snap.val())return
+isRemote=true
+window.isSyncApplying=true
+const data=snap.val().data
+document.querySelectorAll("input,select").forEach((el,i)=>{
+if(data[i]===undefined)return
+el.type==="checkbox"?el.checked=data[i]:el.value=data[i]
+})
+applyRules()
+setTimeout(()=>{isRemote=false;window.isSyncApplying=false},0)
+})
 
-    window.isSyncApplying=true;
-    isApplyingRemote=true;
-
-    apply(snap.val().data);
-    refreshUI();
-
-    setTimeout(()=>{
-      window.isSyncApplying=false;
-      isApplyingRemote=false;
-    },0);
-  });
-
-  document.addEventListener("input", ()=>{
-    if(isApplyingRemote) return;
-    ref.set({ data: collect(), updatedAt: Date.now() });
-  });
-})();
+document.addEventListener("input",()=>{if(window.isSyncApplying)return;pushToCloud()})
+document.addEventListener("change",()=>{if(window.isSyncApplying)return;pushToCloud()})
 </script>
 
 </body>
