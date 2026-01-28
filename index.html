@@ -13,20 +13,27 @@ td,th{border:2px solid #000;padding:6px;text-align:center;font-size:18px}
 .gray-cell{background:#e0e0e0;font-weight:bold}
 .dropdown{width:100%;border-radius:999px;padding:4px 20px;border:none}
 select{text-align-last:center}
+
 .instance-empty{background:#e6e6e6}
 .instance-normal{background:#c8f0c2}
 .instance-trial{background:#4da3ff;color:#fff}
 .instance-guild{background:#5a3a1a;color:#fff}
 .instance-mix{background:#b22222;color:#fff}
+
 .status-open{background:#1e8f4a;color:#fff}
-.status-full{background:#7a1f1f;color:#fff}
+.status-full{background:#f6c1c1;color:#000}
 .status-done{background:#000;color:#fff}
-.role-full td{background:#7a1f1f;color:#fff}
+
+.role-full td{background:#f6c1c1;color:#000}
 .role-done td{background:#4a4a4a;color:#fff}
+
 .trial-locked td{background:#000!important;color:#fff!important}
+
 input{border:none;background:transparent}
 input[type="checkbox"]{transform:scale(1.2)}
+
 .reset-btn{padding:8px 20px;border-radius:999px;border:none;background:#444;color:#fff;cursor:pointer}
+
 .role-cell-tank{background:#f6c1c1}
 .role-cell-heal{background:#cdeecb}
 .role-cell-dps{background:#cfe8ff}
@@ -34,19 +41,8 @@ input[type="checkbox"]{transform:scale(1.2)}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
 
-/* v1.4 既有補丁：置中 */
 #leaderId{text-align:center}
 .role-row td:nth-child(1) input{text-align:center}
-
-/* ===== v1.4.3 完成倒數閃爍 ===== */
-.status-done.flash{
-  animation:flashRed 1s infinite;
-}
-@keyframes flashRed{
-  0%{background:#000}
-  50%{background:#c00000}
-  100%{background:#000}
-}
 </style>
 </head>
 
@@ -59,7 +55,8 @@ input[type="checkbox"]{transform:scale(1.2)}
   <td class="title">報團時間</td>
   <td><input type="date" id="groupDate"></td>
   <td class="gray-cell" id="weekdayCell"></td>
-  <td><input type="time" id="groupTime"></td>
+  <!-- ★ 只顯示時:分 -->
+  <td><input type="time" id="groupTime" step="60" min="00:00" max="23:59"></td>
 </tr>
 
 <tr>
@@ -125,19 +122,13 @@ document.write(`
 </table>
 
 <script>
-/* ===== 全域 ===== */
-window.isSyncApplying=false;
-let countdownTimer=null;
 let countdownInterval=null;
+let countdownTimer=null;
 let countdownSec=0;
-
-/* ===== 完成倒數 ===== */
-let doneCountdownInterval=null;
-let doneCountdownSec=0;
-let doneCountdownRunning=false;
 let lastStatusValue="open";
 
 const groupDate=document.getElementById("groupDate");
+const groupTime=document.getElementById("groupTime");
 const weekdayCell=document.getElementById("weekdayCell");
 const instanceSelect=document.getElementById("instanceSelect");
 const statusSelect=document.getElementById("statusSelect");
@@ -150,6 +141,13 @@ function updateWeekday(){
   weekdayCell.textContent="星期"+weekdays[d.getDay()];
 }
 
+/* ★ 時間永遠只保留 HH:MM */
+function normalizeTime(){
+  if(groupTime.value)groupTime.value=groupTime.value.slice(0,5);
+}
+groupTime.addEventListener("input", normalizeTime);
+groupTime.addEventListener("change", normalizeTime);
+
 function isAllRoleFilled(){
   return [...roleRows].every(row=>{
     const id=row.querySelector("td:nth-child(1) input").value.trim();
@@ -158,26 +156,21 @@ function isAllRoleFilled(){
   });
 }
 
-/* ===== 原本滿團倒數 ===== */
 function startCountdown(){
-  if(countdownInterval || statusSelect.value!=="open") return;
+  if(countdownInterval||statusSelect.value!=="open")return;
   countdownSec=59;
   statusSelect.options[0].text=`未滿（${countdownSec}）`;
-
   countdownInterval=setInterval(()=>{
     countdownSec--;
     if(countdownSec>=0){
       statusSelect.options[0].text=`未滿（${countdownSec}）`;
     }
   },1000);
-
   countdownTimer=setTimeout(()=>{
     stopCountdown();
-    window.isSyncApplying=true;
     statusSelect.value="full";
     applyRules();
     pushToCloud();
-    window.isSyncApplying=false;
   },60000);
 }
 
@@ -186,73 +179,15 @@ function stopCountdown(){
   clearTimeout(countdownTimer);
   countdownInterval=null;
   countdownTimer=null;
-  countdownSec=0;
   statusSelect.options[0].text="未滿";
-}
-
-/* ===== 完成倒數 ===== */
-function startDoneCountdown(){
-  if(doneCountdownRunning) return;
-  doneCountdownRunning=true;
-  doneCountdownSec=10;
-  updateDoneText();
-
-  doneCountdownInterval=setInterval(()=>{
-    doneCountdownSec--;
-    updateDoneText();
-
-    if(doneCountdownSec<=3){
-      statusSelect.classList.add("flash");
-    }
-
-    if(doneCountdownSec<=0){
-      stopDoneCountdown();
-      silentReset();
-    }
-  },1000);
-}
-
-function stopDoneCountdown(){
-  clearInterval(doneCountdownInterval);
-  doneCountdownInterval=null;
-  doneCountdownRunning=false;
-  statusSelect.classList.remove("flash");
-}
-
-function updateDoneText(){
-  [...statusSelect.options].forEach(opt=>{
-    if(opt.value==="done"){
-      opt.text=`完成（${doneCountdownSec}）`;
-    }
-  });
-}
-
-/* ===== 清除 ===== */
-function silentReset(){
-  window.isSyncApplying=true;
-
-  stopCountdown();
-  stopDoneCountdown();
-  lastStatusValue="open";
-
-  document.querySelectorAll("input,select").forEach(el=>{
-    el.type==="checkbox"?el.checked=false:el.value="";
-    el.disabled=false;
-  });
-
-  statusSelect.value="open";
-  updateWeekday();
-  applyRules();
-  pushToCloud();
-
-  window.isSyncApplying=false;
 }
 
 function applyRules(){
   instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
+  statusSelect.className="dropdown status-"+(statusSelect.value||"open");
 
   roleRows.forEach((row,i)=>{
-    row.classList.remove("trial-locked");
+    row.classList.remove("trial-locked","role-full","role-done");
     row.querySelectorAll("input,select").forEach(el=>el.disabled=false);
 
     if(instanceSelect.value==="trial"&&i>=5){
@@ -262,22 +197,15 @@ function applyRules(){
         el.disabled=true;
       });
     }
-  });
-
-  statusSelect.className="dropdown status-"+(statusSelect.value||"open");
-
-  roleRows.forEach(row=>{
-    row.classList.remove("role-full","role-done");
-    if(statusSelect.value==="full")row.classList.add("role-full");
-    if(statusSelect.value==="done")row.classList.add("role-done");
 
     if(statusSelect.value==="full"||statusSelect.value==="done"){
-      row.querySelectorAll("input,select").forEach(el=>el.disabled=true);
+      row.classList.add(statusSelect.value==="full"?"role-full":"role-done");
+      row.querySelectorAll(
+        "td:nth-child(1) input, td:nth-child(2) select, td:nth-child(3) input"
+      ).forEach(el=>el.disabled=true);
     }
-  });
 
-  roleRows.forEach(row=>{
-    const sel=row.querySelector("select");
+    const sel=row.querySelector("td:nth-child(2) select");
     const td=sel.parentElement;
     td.className="";
     const map={
@@ -291,42 +219,34 @@ function applyRules(){
   });
 }
 
-/* ===== 事件 ===== */
 groupDate.addEventListener("change",updateWeekday);
-instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
+instanceSelect.addEventListener("change",applyRules);
 
 statusSelect.addEventListener("change",()=>{
-  if(window.isSyncApplying)return;
-
-  if(statusSelect.value==="done" && lastStatusValue!=="done"){
-    if(!confirm("是否已完成出團？")){
-      statusSelect.value=lastStatusValue;
-      applyRules();
-      return;
-    }
-    startDoneCountdown();
-  }
-
   lastStatusValue=statusSelect.value;
   applyRules();
   pushToCloud();
 });
 
 document.addEventListener("input",()=>{
-  if(window.isSyncApplying)return;
   isAllRoleFilled()?startCountdown():stopCountdown();
   pushToCloud();
 });
-
 document.addEventListener("change",()=>{
-  if(window.isSyncApplying)return;
   isAllRoleFilled()?startCountdown():stopCountdown();
   pushToCloud();
 });
 
 function confirmReset(){
   if(!confirm("確定要清除目前表格內容嗎？"))return;
-  silentReset();
+  document.querySelectorAll("input,select").forEach(el=>{
+    el.type==="checkbox"?el.checked=false:el.value="";
+    el.disabled=false;
+  });
+  statusSelect.value="open";
+  applyRules();
+  updateWeekday();
+  pushToCloud();
 }
 
 applyRules();
@@ -350,7 +270,8 @@ const ref=firebase.database().ref("tables/gameinn-main");
 let isRemote=false;
 
 function collect(){
-  return [...document.querySelectorAll("input,select")].map(el=>el.type==="checkbox"?el.checked:el.value);
+  return [...document.querySelectorAll("input,select")]
+    .map(el=>el.type==="checkbox"?el.checked:el.value);
 }
 
 function pushToCloud(){
@@ -361,22 +282,15 @@ function pushToCloud(){
 ref.on("value",snap=>{
   if(!snap.val())return;
   isRemote=true;
-  window.isSyncApplying=true;
-
-  const data=snap.val().data;
-  document.querySelectorAll("input,select").forEach((el,i)=>{
-    if(data[i]===undefined)return;
-    el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
+  snap.val().data.forEach((v,i)=>{
+    const el=document.querySelectorAll("input,select")[i];
+    if(!el)return;
+    el.type==="checkbox"?el.checked=v:el.value=v;
   });
-
-  if(statusSelect.value==="done"){
-    startDoneCountdown();
-  }
-
+  normalizeTime();
   updateWeekday();
   applyRules();
-
-  setTimeout(()=>{isRemote=false;window.isSyncApplying=false;},0);
+  isRemote=false;
 });
 </script>
 
