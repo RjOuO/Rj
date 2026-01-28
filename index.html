@@ -34,7 +34,7 @@ input[type="checkbox"]{transform:scale(1.2)}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
 
-/* v1.4 補丁：置中 */
+/* v1.4 既有補丁：置中 */
 #leaderId{text-align:center}
 .role-row td:nth-child(1) input{text-align:center}
 </style>
@@ -120,7 +120,7 @@ let countdownTimer=null;
 let countdownInterval=null;
 let countdownSec=0;
 
-/* ★ 新增：完成後自動清除計時器 */
+/* ★ 完成後自動清除 */
 let doneAutoResetTimer=null;
 
 const groupDate=document.getElementById("groupDate");
@@ -144,7 +144,7 @@ function isAllRoleFilled(){
   });
 }
 
-/* ===== 原本滿團倒數（不動） ===== */
+/* ===== 原滿團倒數（不動） ===== */
 function startCountdown(){
   if(countdownInterval || statusSelect.value!=="open") return;
 
@@ -177,7 +177,7 @@ function stopCountdown(){
   statusSelect.options[0].text="未滿";
 }
 
-/* ★ 不跳確認的一鍵清除（僅給自動用） */
+/* ★ 不跳確認的一鍵清除 */
 function silentReset(){
   window.isSyncApplying=true;
   stopCountdown();
