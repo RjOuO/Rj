@@ -33,6 +33,14 @@ input[type="checkbox"]{transform:scale(1.2)}
 .role-cell-ht{background:#e3d4f3}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
+
+/* ===== v1.4 補丁：置中對齊（僅此新增） ===== */
+#leaderId{
+  text-align:center;
+}
+.role-row td:nth-child(1) input{
+  text-align:center;
+}
 </style>
 </head>
 
@@ -111,7 +119,6 @@ document.write(`
 </table>
 
 <script>
-/* ===== 全域 ===== */
 window.isSyncApplying=false;
 let countdownTimer=null;
 let countdownInterval=null;
@@ -124,14 +131,12 @@ const statusSelect=document.getElementById("statusSelect");
 const roleRows=document.querySelectorAll(".role-row");
 const weekdays=["日","一","二","三","四","五","六"];
 
-/* ===== 星期 ===== */
 function updateWeekday(){
   if(!groupDate.value){weekdayCell.textContent="";return;}
   const d=new Date(groupDate.value);
   weekdayCell.textContent="星期"+weekdays[d.getDay()];
 }
 
-/* ===== 滿團判斷 ===== */
 function isAllRoleFilled(){
   return [...roleRows].every(row=>{
     const id=row.querySelector("td:nth-child(1) input").value.trim();
@@ -140,7 +145,6 @@ function isAllRoleFilled(){
   });
 }
 
-/* ===== 倒數控制 ===== */
 function startCountdown(){
   if(countdownInterval || statusSelect.value!=="open") return;
 
@@ -173,7 +177,6 @@ function stopCountdown(){
   statusSelect.options[0].text="未滿";
 }
 
-/* ===== 規則引擎（原樣） ===== */
 function applyRules(){
   instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
 
@@ -218,7 +221,6 @@ function applyRules(){
   });
 }
 
-/* ===== 事件 ===== */
 groupDate.addEventListener("change",updateWeekday);
 instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
 statusSelect.addEventListener("change",()=>{
@@ -239,7 +241,6 @@ document.addEventListener("change",()=>{
   pushToCloud();
 });
 
-/* ===== 清除 ===== */
 function confirmReset(){
   if(!confirm("確定要清除目前表格內容嗎？"))return;
   window.isSyncApplying=true;
@@ -259,7 +260,6 @@ applyRules();
 updateWeekday();
 </script>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -273,7 +273,6 @@ firebase.initializeApp({
 </script>
 
 <script>
-/* ===== Cloud Sync ===== */
 const ref=firebase.database().ref("tables/gameinn-main");
 let isRemote=false;
 
