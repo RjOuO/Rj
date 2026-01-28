@@ -10,93 +10,37 @@ body {
   background: #f5f5f5;
   padding: 30px;
 }
-
-table {
-  border-collapse: collapse;
-  background: #fff;
-}
-
+table { border-collapse: collapse; background: #fff; }
 td, th {
   border: 2px solid #000;
   padding: 6px;
   text-align: center;
   font-size: 18px;
-  vertical-align: middle;
 }
-
 .title { background: #fff200; font-weight: bold; }
 .header { background: #ffe8b0; font-weight: bold; }
 .gray-cell { background: #e0e0e0; font-weight: bold; }
-
 .dropdown {
   width: 100%;
   border-radius: 999px;
   padding: 4px 20px;
   border: none;
-  cursor: pointer;
 }
-
-/* input / select 置中 */
-td > select,
-td > input[type="text"],
-td > input[type="date"],
-td > input[type="time"] {
-  display: block;
-  margin: 0 auto;
-  text-align: center;
-}
-
-select {
-  text-align-last: center;
-}
-
-/* 副本顏色（選取後） */
+select { text-align-last: center; }
 .instance-empty { background: #e6e6e6; }
 .instance-normal { background: #c8f0c2; }
-.instance-trial { background: #4da3ff; color: #fff; }
-.instance-guild { background: #5a3a1a; color: #fff; }
-.instance-mix { background: #b22222; color: #fff; }
-
-/* 副本 option 底色 */
-#instanceSelect option:nth-child(1) { background-color: #ffffff; }
-#instanceSelect option:nth-child(2) { background-color: #c8f0c2; }
-#instanceSelect option:nth-child(3) { background-color: #4da3ff; color: #fff; }
-#instanceSelect option:nth-child(4) { background-color: #5a3a1a; color: #fff; }
-#instanceSelect option:nth-child(5) { background-color: #b22222; color: #fff; }
-
-/* 狀態顏色（選取後） */
-.status-empty { background: #e6e6e6; }
-.status-open { background: #1e8f4a; color: #fff; }
-.status-full { background: #c0392b; color: #fff; }
-.status-done { background: #000; color: #fff; }
-
-/* 狀態 option 底色 */
-#statusSelect option:nth-child(1) { background-color: #ffffff; }
-#statusSelect option:nth-child(2) { background-color: #1e8f4a; color: #fff; }
-#statusSelect option:nth-child(3) { background-color: #c0392b; color: #fff; }
-#statusSelect option:nth-child(4) { background-color: #000000; color: #fff; }
-
-/* 角色狀態 */
-.role-full td { background: #7a1f1f; color: #fff; }
-.role-done td { background: #4a4a4a; color: #fff; }
-
-/* 試劍鎖定 */
-.trial-locked td {
-  background: #000 !important;
-  color: #fff !important;
-}
-
-input[type="checkbox"] {
-  transform: scale(1.2);
-}
-
-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  color: inherit;
-}
-
+.instance-trial { background: #4da3ff; color:#fff; }
+.instance-guild { background: #5a3a1a; color:#fff; }
+.instance-mix { background: #b22222; color:#fff; }
+.status-empty { background:#e6e6e6; }
+.status-open { background:#1e8f4a; color:#fff; }
+.status-full { background:#7a1f1f; color:#fff; }
+.status-done { background:#000; color:#fff; }
+.role-full td { background:#7a1f1f; color:#fff; }
+.role-done td { background:#4a4a4a; color:#fff; }
+.trial-locked td { background:#000!important; color:#fff!important; }
+input { border:none; background:transparent; }
+input[type="checkbox"] { transform: scale(1.2); }
 .reset-btn {
   padding: 8px 20px;
   border-radius: 999px;
@@ -105,34 +49,18 @@ input {
   color: #fff;
   cursor: pointer;
 }
-
-/* 定位 option 底色 */
-.role-row select option:nth-child(1) { background-color: #ffffff; }
-.role-row select option:nth-child(2) { background-color: #f6c1c1; }
-.role-row select option:nth-child(3) { background-color: #cdeecb; }
-.role-row select option:nth-child(4) { background-color: #cfe8ff; }
-.role-row select option:nth-child(5) { background-color: #e3d4f3; }
-.role-row select option:nth-child(6) { background-color: #e6e6e6; }
-
-/* 定位欄位顯示底色 */
-.role-cell-empty { background: #ffffff; }
-.role-cell-tank { background: #f6c1c1; }
-.role-cell-heal { background: #cdeecb; }
-.role-cell-dps { background: #cfe8ff; }
-.role-cell-ht { background: #e3d4f3; }
-.role-cell-dh { background: #e6e6e6; }
+.role-cell-tank { background:#f6c1c1; }
+.role-cell-heal { background:#cdeecb; }
+.role-cell-dps { background:#cfe8ff; }
+.role-cell-ht { background:#e3d4f3; }
+.role-cell-dh { background:#e6e6e6; }
 </style>
 </head>
 
 <body>
 
 <table>
-
-<tr>
-  <td colspan="4">
-    <button class="reset-btn" onclick="confirmReset()">一鍵清除</button>
-  </td>
-</tr>
+<tr><td colspan="4"><button class="reset-btn" onclick="confirmReset()">一鍵清除</button></td></tr>
 
 <tr>
   <td class="title">報團時間</td>
@@ -160,20 +88,13 @@ input {
   </td>
   <td>
     <select id="levelSelect" class="dropdown">
-      <option></option>
-      <option>56</option>
-      <option>61</option>
-      <option>66</option>
-      <option>71</option>
+      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
     </select>
   </td>
-  <td><input type="text" id="leaderId"></td>
+  <td><input id="leaderId"></td>
   <td>
     <select id="statusSelect" class="dropdown status-empty">
-      <option></option>
-      <option value="open">未滿</option>
-      <option value="full">滿團</option>
-      <option value="done">完成</option>
+      <option></option><option value="open">未滿</option><option value="full">滿團</option><option value="done">完成</option>
     </select>
   </td>
 </tr>
@@ -186,189 +107,139 @@ input {
 </tr>
 
 <script>
-for (let i = 0; i < 10; i++) {
-  document.write(`
-  <tr class="role-row">
-    <td><input></td>
-    <td>
-      <select class="dropdown">
-        <option></option>
-        <option>坦</option>
-        <option>全奶</option>
-        <option>輸出</option>
-        <option>奶坦</option>
-        <option>輸出奶</option>
-      </select>
-    </td>
-    <td><input type="checkbox"></td>
-    <td><input></td>
-  </tr>`);
+for (let i=0;i<10;i++){
+document.write(`
+<tr class="role-row">
+<td><input></td>
+<td>
+<select class="dropdown">
+<option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option>
+</select>
+</td>
+<td><input type="checkbox"></td>
+<td><input></td>
+</tr>`);
 }
 </script>
-
 </table>
 
 <script>
-const groupDate = document.getElementById("groupDate");
-const groupTime = document.getElementById("groupTime");
-const weekdayCell = document.getElementById("weekdayCell");
-const instanceSelect = document.getElementById("instanceSelect");
-const statusSelect = document.getElementById("statusSelect");
-const roleRows = document.querySelectorAll(".role-row");
-const leaderId = document.getElementById("leaderId");
-const levelSelect = document.getElementById("levelSelect");
+/* ========= v1.0 原始邏輯（加同步防護） ========= */
+window.isSyncApplying = false;
 
-const weekdays = ["日","一","二","三","四","五","六"];
+const groupDate=document.getElementById("groupDate");
+const groupTime=document.getElementById("groupTime");
+const weekdayCell=document.getElementById("weekdayCell");
+const instanceSelect=document.getElementById("instanceSelect");
+const statusSelect=document.getElementById("statusSelect");
+const roleRows=document.querySelectorAll(".role-row");
+const weekdays=["日","一","二","三","四","五","六"];
 
-function updateWeekday() {
-  if (!groupDate.value) {
-    weekdayCell.textContent = "";
-    return;
-  }
-  const d = new Date(groupDate.value);
-  weekdayCell.textContent = "星期" + weekdays[d.getDay()];
+function updateWeekday(){
+  if(!groupDate.value){weekdayCell.textContent="";return;}
+  const d=new Date(groupDate.value);
+  weekdayCell.textContent="星期"+weekdays[d.getDay()];
 }
 
-function setNow() {
-  const n = new Date();
-  groupDate.value = n.toISOString().split("T")[0];
-  groupTime.value =
-    String(n.getHours()).padStart(2,"0") + ":" +
-    String(n.getMinutes()).padStart(2,"0");
+function setNow(){
+  const n=new Date();
+  groupDate.value=n.toISOString().split("T")[0];
+  groupTime.value=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
   updateWeekday();
 }
 
-function confirmReset() {
-  if (confirm("確定要清除目前表格內容嗎？")) resetForm();
+function confirmReset(){
+  if(confirm("確定要清除目前表格內容嗎？")) resetForm();
 }
 
-function resetForm() {
+function resetForm(){
   setNow();
-  instanceSelect.value = "";
-  statusSelect.value = "";
-  instanceSelect.className = "dropdown instance-empty";
-  statusSelect.className = "dropdown status-empty";
-  leaderId.value = "";
-  levelSelect.value = "";
-
-  roleRows.forEach(row => {
-    row.className = "role-row";
-    row.querySelectorAll("input,select").forEach(el => {
-      el.disabled = false;
-      el.type === "checkbox" ? el.checked = false : el.value = "";
+  instanceSelect.value="";
+  statusSelect.value="";
+  instanceSelect.className="dropdown instance-empty";
+  statusSelect.className="dropdown status-empty";
+  roleRows.forEach(r=>{
+    r.className="role-row";
+    r.querySelectorAll("input,select").forEach(el=>{
+      el.disabled=false;
+      el.type==="checkbox"?el.checked=false:el.value="";
     });
   });
 }
 
-groupDate.addEventListener("change", updateWeekday);
+groupDate.addEventListener("change",updateWeekday);
 
-instanceSelect.addEventListener("change", () => {
-  instanceSelect.className = "dropdown instance-" + instanceSelect.value;
-
-  roleRows.forEach((row, i) => {
-    row.classList.remove("trial-locked");
-    row.querySelectorAll("input,select").forEach(el => el.disabled = false);
-
-    if (instanceSelect.value === "trial" && i >= 5) {
-      row.classList.add("trial-locked");
-      row.querySelectorAll("input,select").forEach(el => {
-        el.type === "checkbox" ? el.checked = false : el.value = "";
-        el.disabled = true;
-      });
-    }
-  });
+instanceSelect.addEventListener("change",()=>{
+  if(window.isSyncApplying) return;
+  instanceSelect.className="dropdown instance-"+instanceSelect.value;
 });
 
-statusSelect.addEventListener("change", () => {
-  statusSelect.className = "dropdown status-" + statusSelect.value;
-  roleRows.forEach(row => {
-    row.classList.remove("role-full","role-done");
-    if (statusSelect.value === "full") row.classList.add("role-full");
-    if (statusSelect.value === "done") row.classList.add("role-done");
-  });
+statusSelect.addEventListener("change",()=>{
+  if(window.isSyncApplying) return;
+  statusSelect.className="dropdown status-"+statusSelect.value;
 });
 
-document.querySelectorAll(".role-row select").forEach(select => {
-  const td = select.parentElement;
-  select.addEventListener("change", () => {
-    td.className = "";
-    switch (select.value) {
-      case "坦": td.classList.add("role-cell-tank"); break;
-      case "全奶": td.classList.add("role-cell-heal"); break;
-      case "輸出": td.classList.add("role-cell-dps"); break;
-      case "奶坦": td.classList.add("role-cell-ht"); break;
-      case "輸出奶": td.classList.add("role-cell-dh"); break;
-      default: td.classList.add("role-cell-empty");
-    }
+document.querySelectorAll(".role-row select").forEach(select=>{
+  const td=select.parentElement;
+  select.addEventListener("change",()=>{
+    if(window.isSyncApplying) return;
+    td.className="";
+    const map={
+      "坦":"role-cell-tank",
+      "全奶":"role-cell-heal",
+      "輸出":"role-cell-dps",
+      "奶坦":"role-cell-ht",
+      "輸出奶":"role-cell-dh"
+    };
+    if(map[select.value]) td.classList.add(map[select.value]);
   });
 });
 
 setNow();
 </script>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
-  authDomain: "rjgame-582d0.firebaseapp.com",
-  databaseURL: "https://rjgame-582d0-default-rtdb.firebaseio.com",
-  projectId: "rjgame-582d0",
-  storageBucket: "rjgame-582d0.appspot.com"
-};
-
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp({
+  apiKey:"AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
+  authDomain:"rjgame-582d0.firebaseapp.com",
+  databaseURL:"https://rjgame-582d0-default-rtdb.firebaseio.com",
+  projectId:"rjgame-582d0"
+});
 </script>
+
 <script>
-/* =========================
-   Cloud Sync Module
-   v1.0 compatible
-   ========================= */
+/* ========= Cloud Sync Module（穩定版） ========= */
+(function(){
+  const ref=firebase.database().ref("tables/gameinn-main");
+  let isApplyingRemote=false;
 
-(function () {
-
-  const db = firebase.database();
-
-  /* 同一個 key = 同一張表 */
-  const SYNC_KEY = "gameinn-main";
-  const ref = db.ref("tables/" + SYNC_KEY);
-
-  /* 收集目前表格資料 */
-  function collectData() {
-    const data = [];
-    document.querySelectorAll("input, select").forEach(el => {
-      data.push(el.type === "checkbox" ? el.checked : el.value);
-    });
-    return data;
+  function collect(){
+    return [...document.querySelectorAll("input,select")].map(el =>
+      el.type==="checkbox"?el.checked:el.value
+    );
   }
 
-  /* 套用雲端資料到表格 */
-  function applyData(data) {
-    document.querySelectorAll("input, select").forEach((el, i) => {
-      if (data[i] === undefined) return;
-      el.type === "checkbox"
-        ? el.checked = data[i]
-        : el.value = data[i];
+  function apply(data){
+    [...document.querySelectorAll("input,select")].forEach((el,i)=>{
+      if(data[i]===undefined) return;
+      el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
     });
   }
 
-  /* 雲端 → 本地（即時監聽） */
-  ref.on("value", snapshot => {
-    const val = snapshot.val();
-    if (!val || !val.data) return;
-    applyData(val.data);
+  ref.on("value",snap=>{
+    if(!snap.val()) return;
+    window.isSyncApplying=true;
+    isApplyingRemote=true;
+    apply(snap.val().data);
+    setTimeout(()=>{window.isSyncApplying=false;isApplyingRemote=false;},0);
   });
 
-  /* 本地 → 雲端（任何變動就寫） */
-  function pushToCloud() {
-    ref.set({
-      updatedAt: Date.now(),
-      data: collectData()
-    });
-  }
-
-  document.addEventListener("input", pushToCloud);
-  document.addEventListener("change", pushToCloud);
-
+  document.addEventListener("input",()=>{ if(isApplyingRemote) return;
+    ref.set({data:collect(),updatedAt:Date.now()});
+  });
 })();
 </script>
 
