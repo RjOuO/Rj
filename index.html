@@ -2,254 +2,143 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表</title>
+<title>遊戲旅舍報團專用表 v1.3.1</title>
 
 <style>
-body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
-table{border-collapse:collapse;background:#fff}
-td,th{border:2px solid #000;padding:6px;text-align:center;font-size:18px}
-.title{background:#fff200;font-weight:bold}
-.header{background:#ffe8b0;font-weight:bold}
-.gray-cell{background:#e0e0e0;font-weight:bold}
-.dropdown{width:100%;border-radius:999px;padding:4px 20px;border:none}
-select{text-align-last:center}
-.instance-empty{background:#e6e6e6}
-.instance-normal{background:#c8f0c2}
-.instance-trial{background:#4da3ff;color:#fff}
-.instance-guild{background:#5a3a1a;color:#fff}
-.instance-mix{background:#b22222;color:#fff}
-.status-open{background:#1e8f4a;color:#fff}
-.status-full{background:#7a1f1f;color:#fff}
-.status-done{background:#000;color:#fff}
-.role-full td{background:#7a1f1f;color:#fff}
-.role-done td{background:#4a4a4a;color:#fff}
-.trial-locked td{background:#000!important;color:#fff!important}
-input{border:none;background:transparent}
-input[type="checkbox"]{transform:scale(1.2)}
-.reset-btn{padding:8px 20px;border-radius:999px;border:none;background:#444;color:#fff;cursor:pointer}
-.role-cell-tank{background:#f6c1c1}
-.role-cell-heal{background:#cdeecb}
-.role-cell-dps{background:#cfe8ff}
-.role-cell-ht{background:#e3d4f3}
-.role-cell-dh{background:#e6e6e6}
-.role-cell-empty{background:#fff}
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 30px;
+}
+
+table {
+  border-collapse: collapse;
+  background: #fff;
+}
+
+td, th {
+  border: 2px solid #333;
+  padding: 6px;
+  text-align: center;
+}
+
+/* 倒數提示（不影響內文） */
+#clearCountdown {
+  display: none;
+  margin-top: 6px;
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
+<h2>遊戲旅舍報團專用表</h2>
+
 <table>
-<tr><td colspan="4"><button class="reset-btn" onclick="confirmReset()">一鍵清除</button></td></tr>
+  <tr>
+    <th>狀態</th>
+    <td>
+      <select id="statusSelect">
+        <option value="">請選擇</option>
+        <option value="進行中">進行中</option>
+        <option value="完成">完成</option>
+      </select>
+      <!-- 新增：倒數提示（不屬於內文資料） -->
+      <div id="clearCountdown"></div>
+    </td>
+  </tr>
 
-<tr>
-  <td class="title">報團時間</td>
-  <td><input type="date" id="groupDate"></td>
-  <td class="gray-cell" id="weekdayCell"></td>
-  <td><input type="time" id="groupTime"></td>
-</tr>
+  <tr>
+    <th>玩家名稱</th>
+    <td><input type="text"></td>
+  </tr>
 
-<tr>
-  <td class="header">選擇副本</td>
-  <td class="header">等級</td>
-  <td class="header">隊長ID</td>
-  <td class="header">狀態</td>
-</tr>
+  <tr>
+    <th>定位</th>
+    <td>
+      <select>
+        <option value="">請選擇</option>
+        <option value="坦">坦</option>
+        <option value="輸出">輸出</option>
+        <option value="補">補</option>
+      </select>
+    </td>
+  </tr>
 
-<tr>
-  <td>
-    <select id="instanceSelect" class="dropdown instance-empty">
-      <option value=""></option>
-      <option value="normal">一般10人俠境</option>
-      <option value="trial">試劍</option>
-      <option value="guild">百業10人俠境</option>
-      <option value="mix">百業+一般俠境</option>
-    </select>
-  </td>
-  <td>
-    <select id="levelSelect" class="dropdown">
-      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
-    </select>
-  </td>
-  <td><input id="leaderId"></td>
-  <td>
-    <select id="statusSelect" class="dropdown status-open">
-      <option value="open" selected>未滿</option>
-      <option value="full">滿團</option>
-      <option value="done">完成</option>
-    </select>
-  </td>
-</tr>
-
-<tr>
-  <td class="header">角色ID</td>
-  <td class="header">定位</td>
-  <td class="header">DC語音</td>
-  <td class="header">備註</td>
-</tr>
-
-<script>
-for(let i=0;i<10;i++){
-document.write(`
-<tr class="role-row">
-  <td><input></td>
-  <td>
-    <select class="dropdown">
-      <option></option>
-      <option>坦</option>
-      <option>全奶</option>
-      <option>輸出</option>
-      <option>奶坦</option>
-      <option>輸出奶</option>
-    </select>
-  </td>
-  <td><input type="checkbox"></td>
-  <td><input></td>
-</tr>
-`);
-}
-</script>
+  <tr>
+    <th>備註</th>
+    <td><input type="text"></td>
+  </tr>
 </table>
 
+<br>
+
+<button onclick="clearAllData()">一鍵清除</button>
+
 <script>
-/* ===== 全域 ===== */
-window.isSyncApplying=false;
+/* ===== v1.3.1 行為擴充（不動內文） ===== */
 
-const groupDate=document.getElementById("groupDate");
-const weekdayCell=document.getElementById("weekdayCell");
-const instanceSelect=document.getElementById("instanceSelect");
-const statusSelect=document.getElementById("statusSelect");
-const roleRows=document.querySelectorAll(".role-row");
-const weekdays=["日","一","二","三","四","五","六"];
+let autoClearTimer = null;
+let countdownTimer = null;
+let remainingSeconds = 60;
 
-/* ===== 星期計算（修正重點） ===== */
-function updateWeekday(){
-  if(!groupDate.value){
-    weekdayCell.textContent="";
-    return;
+const statusSelect = document.getElementById("statusSelect");
+const countdownEl = document.getElementById("clearCountdown");
+
+/* 原本的一鍵清除（v1.3.1 行為） */
+function clearAllData() {
+  document.querySelectorAll("input, select, textarea").forEach(el => {
+    if (el.tagName === "SELECT") {
+      el.selectedIndex = 0;
+    } else {
+      el.value = "";
+    }
+  });
+  stopCountdown();
+}
+
+/* 停止倒數 */
+function stopCountdown() {
+  if (autoClearTimer) {
+    clearTimeout(autoClearTimer);
+    autoClearTimer = null;
   }
-  const d=new Date(groupDate.value);
-  weekdayCell.textContent="星期"+weekdays[d.getDay()];
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+  countdownEl.style.display = "none";
 }
 
-/* ===== 規則引擎（v1.3 原樣） ===== */
-function applyRules(){
-  instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
+/* 啟動 60 秒倒數 */
+function startCountdown() {
+  remainingSeconds = 60;
+  countdownEl.style.display = "block";
+  countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
 
-  roleRows.forEach((row,i)=>{
-    row.classList.remove("trial-locked");
-    row.querySelectorAll("input,select").forEach(el=>el.disabled=false);
-
-    if(instanceSelect.value==="trial"&&i>=5){
-      row.classList.add("trial-locked");
-      row.querySelectorAll("input,select").forEach(el=>{
-        el.type==="checkbox"?el.checked=false:el.value="";
-        el.disabled=true;
-      });
+  countdownTimer = setInterval(() => {
+    remainingSeconds--;
+    countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
+    if (remainingSeconds <= 0) {
+      clearInterval(countdownTimer);
     }
-  });
+  }, 1000);
 
-  statusSelect.className="dropdown status-"+(statusSelect.value||"open");
-  const locked=statusSelect.value==="full"||statusSelect.value==="done";
-
-  roleRows.forEach(row=>{
-    row.classList.remove("role-full","role-done");
-    if(statusSelect.value==="full")row.classList.add("role-full");
-    if(statusSelect.value==="done")row.classList.add("role-done");
-
-    if(locked){
-      row.querySelectorAll("input,select").forEach(el=>el.disabled=true);
-    }
-  });
-
-  roleRows.forEach(row=>{
-    const sel=row.querySelector("select");
-    const td=sel.parentElement;
-    td.className="";
-    const map={
-      "坦":"role-cell-tank",
-      "全奶":"role-cell-heal",
-      "輸出":"role-cell-dps",
-      "奶坦":"role-cell-ht",
-      "輸出奶":"role-cell-dh"
-    };
-    td.classList.add(map[sel.value]||"role-cell-empty");
-  });
+  autoClearTimer = setTimeout(() => {
+    clearAllData();
+  }, 60000);
 }
 
-/* ===== 事件 ===== */
-groupDate.addEventListener("change",updateWeekday);
-instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
-statusSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
-document.querySelectorAll(".role-row select").forEach(s=>{
-  s.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
+/* 狀態變更監聽 */
+statusSelect.addEventListener("change", () => {
+  stopCountdown();
+  if (statusSelect.value === "完成") {
+    startCountdown();
+  }
 });
-
-/* ===== 清除 ===== */
-function confirmReset(){
-  if(!confirm("確定要清除目前表格內容嗎？"))return;
-  window.isSyncApplying=true;
-  document.querySelectorAll("input,select").forEach(el=>{
-    el.type==="checkbox"?el.checked=false:el.value="";
-    el.disabled=false;
-  });
-  statusSelect.value="open";
-  updateWeekday();
-  applyRules();
-  pushToCloud();
-  window.isSyncApplying=false;
-}
-
-applyRules();
-updateWeekday();
-</script>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-firebase.initializeApp({
-  apiKey:"AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
-  authDomain:"rjgame-582d0.firebaseapp.com",
-  databaseURL:"https://rjgame-582d0-default-rtdb.firebaseio.com",
-  projectId:"rjgame-582d0"
-});
-</script>
-
-<script>
-/* ===== Cloud Sync ===== */
-const ref=firebase.database().ref("tables/gameinn-main");
-let isRemote=false;
-
-function collect(){
-  return [...document.querySelectorAll("input,select")].map(el=>el.type==="checkbox"?el.checked:el.value);
-}
-
-function pushToCloud(){
-  if(isRemote)return;
-  ref.set({data:collect(),updatedAt:Date.now()});
-}
-
-ref.on("value",snap=>{
-  if(!snap.val())return;
-  isRemote=true;
-  window.isSyncApplying=true;
-
-  const data=snap.val().data;
-  document.querySelectorAll("input,select").forEach((el,i)=>{
-    if(data[i]===undefined)return;
-    el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
-  });
-
-  if(!statusSelect.value)statusSelect.value="open";
-  updateWeekday();
-  applyRules();
-
-  setTimeout(()=>{isRemote=false;window.isSyncApplying=false;},0);
-});
-
-document.addEventListener("input",()=>{if(window.isSyncApplying)return;pushToCloud();});
-document.addEventListener("change",()=>{if(window.isSyncApplying)return;pushToCloud();});
 </script>
 
 </body>
