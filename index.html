@@ -34,13 +34,9 @@ input[type="checkbox"]{transform:scale(1.2)}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
 
-/* ===== v1.4 補丁：置中對齊（僅此新增） ===== */
-#leaderId{
-  text-align:center;
-}
-.role-row td:nth-child(1) input{
-  text-align:center;
-}
+/* v1.4 補丁：置中 */
+#leaderId{text-align:center}
+.role-row td:nth-child(1) input{text-align:center}
 </style>
 </head>
 
@@ -124,6 +120,9 @@ let countdownTimer=null;
 let countdownInterval=null;
 let countdownSec=0;
 
+/* ★ 新增：完成後自動清除計時器 */
+let doneAutoResetTimer=null;
+
 const groupDate=document.getElementById("groupDate");
 const weekdayCell=document.getElementById("weekdayCell");
 const instanceSelect=document.getElementById("instanceSelect");
@@ -145,6 +144,7 @@ function isAllRoleFilled(){
   });
 }
 
+/* ===== 原本滿團倒數（不動） ===== */
 function startCountdown(){
   if(countdownInterval || statusSelect.value!=="open") return;
 
@@ -175,6 +175,25 @@ function stopCountdown(){
   countdownTimer=null;
   countdownSec=0;
   statusSelect.options[0].text="未滿";
+}
+
+/* ★ 不跳確認的一鍵清除（僅給自動用） */
+function silentReset(){
+  window.isSyncApplying=true;
+  stopCountdown();
+  clearTimeout(doneAutoResetTimer);
+  doneAutoResetTimer=null;
+
+  document.querySelectorAll("input,select").forEach(el=>{
+    el.type==="checkbox"?el.checked=false:el.value="";
+    el.disabled=false;
+  });
+
+  statusSelect.value="open";
+  updateWeekday();
+  applyRules();
+  pushToCloud();
+  window.isSyncApplying=false;
 }
 
 function applyRules(){
@@ -221,12 +240,24 @@ function applyRules(){
   });
 }
 
+/* ===== 事件 ===== */
 groupDate.addEventListener("change",updateWeekday);
 instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
+
 statusSelect.addEventListener("change",()=>{
   if(window.isSyncApplying)return;
+
   stopCountdown();
+  clearTimeout(doneAutoResetTimer);
+  doneAutoResetTimer=null;
+
   applyRules();
+
+  if(statusSelect.value==="done"){
+    doneAutoResetTimer=setTimeout(()=>{
+      silentReset();
+    },10000);
+  }
 });
 
 document.addEventListener("input",()=>{
@@ -243,17 +274,7 @@ document.addEventListener("change",()=>{
 
 function confirmReset(){
   if(!confirm("確定要清除目前表格內容嗎？"))return;
-  window.isSyncApplying=true;
-  stopCountdown();
-  document.querySelectorAll("input,select").forEach(el=>{
-    el.type==="checkbox"?el.checked=false:el.value="";
-    el.disabled=false;
-  });
-  statusSelect.value="open";
-  updateWeekday();
-  applyRules();
-  pushToCloud();
-  window.isSyncApplying=false;
+  silentReset();
 }
 
 applyRules();
@@ -290,6 +311,8 @@ ref.on("value",snap=>{
   isRemote=true;
   window.isSyncApplying=true;
   stopCountdown();
+  clearTimeout(doneAutoResetTimer);
+  doneAutoResetTimer=null;
 
   const data=snap.val().data;
   document.querySelectorAll("input,select").forEach((el,i)=>{
