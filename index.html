@@ -20,27 +20,35 @@ td, th {
 .title { background: #fff200; font-weight: bold; }
 .header { background: #ffe8b0; font-weight: bold; }
 .gray-cell { background: #e0e0e0; font-weight: bold; }
+
 .dropdown {
   width: 100%;
   border-radius: 999px;
   padding: 4px 20px;
   border: none;
 }
+
 select { text-align-last: center; }
+
 .instance-empty { background: #e6e6e6; }
 .instance-normal { background: #c8f0c2; }
 .instance-trial { background: #4da3ff; color:#fff; }
 .instance-guild { background: #5a3a1a; color:#fff; }
 .instance-mix { background: #b22222; color:#fff; }
+
 .status-empty { background:#e6e6e6; }
 .status-open { background:#1e8f4a; color:#fff; }
 .status-full { background:#7a1f1f; color:#fff; }
 .status-done { background:#000; color:#fff; }
+
 .role-full td { background:#7a1f1f; color:#fff; }
 .role-done td { background:#4a4a4a; color:#fff; }
+
 .trial-locked td { background:#000!important; color:#fff!important; }
+
 input { border:none; background:transparent; }
 input[type="checkbox"] { transform: scale(1.2); }
+
 .reset-btn {
   padding: 8px 20px;
   border-radius: 999px;
@@ -49,11 +57,13 @@ input[type="checkbox"] { transform: scale(1.2); }
   color: #fff;
   cursor: pointer;
 }
+
 .role-cell-tank { background:#f6c1c1; }
 .role-cell-heal { background:#cdeecb; }
 .role-cell-dps { background:#cfe8ff; }
 .role-cell-ht { background:#e3d4f3; }
 .role-cell-dh { background:#e6e6e6; }
+.role-cell-empty { background:#fff; }
 </style>
 </head>
 
@@ -113,7 +123,12 @@ document.write(`
 <td><input></td>
 <td>
 <select class="dropdown">
-<option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option>
+<option></option>
+<option>坦</option>
+<option>全奶</option>
+<option>輸出</option>
+<option>奶坦</option>
+<option>輸出奶</option>
 </select>
 </td>
 <td><input type="checkbox"></td>
@@ -124,16 +139,16 @@ document.write(`
 </table>
 
 <script>
-/* ========= v1.0 原始邏輯（加同步防護） ========= */
+/* ===== v1.0 原始邏輯 + 同步防護 ===== */
 window.isSyncApplying = false;
 
-const groupDate=document.getElementById("groupDate");
-const groupTime=document.getElementById("groupTime");
-const weekdayCell=document.getElementById("weekdayCell");
-const instanceSelect=document.getElementById("instanceSelect");
-const statusSelect=document.getElementById("statusSelect");
-const roleRows=document.querySelectorAll(".role-row");
-const weekdays=["日","一","二","三","四","五","六"];
+const groupDate = document.getElementById("groupDate");
+const groupTime = document.getElementById("groupTime");
+const weekdayCell = document.getElementById("weekdayCell");
+const instanceSelect = document.getElementById("instanceSelect");
+const statusSelect = document.getElementById("statusSelect");
+const roleRows = document.querySelectorAll(".role-row");
+const weekdays = ["日","一","二","三","四","五","六"];
 
 function updateWeekday(){
   if(!groupDate.value){weekdayCell.textContent="";return;}
@@ -158,6 +173,7 @@ function resetForm(){
   statusSelect.value="";
   instanceSelect.className="dropdown instance-empty";
   statusSelect.className="dropdown status-empty";
+
   roleRows.forEach(r=>{
     r.className="role-row";
     r.querySelectorAll("input,select").forEach(el=>{
@@ -165,24 +181,37 @@ function resetForm(){
       el.type==="checkbox"?el.checked=false:el.value="";
     });
   });
+
+  refreshUI();
 }
 
-groupDate.addEventListener("change",updateWeekday);
+groupDate.addEventListener("change", updateWeekday);
 
-instanceSelect.addEventListener("change",()=>{
+instanceSelect.addEventListener("change", ()=>{
   if(window.isSyncApplying) return;
-  instanceSelect.className="dropdown instance-"+instanceSelect.value;
+  refreshUI();
 });
 
-statusSelect.addEventListener("change",()=>{
+statusSelect.addEventListener("change", ()=>{
   if(window.isSyncApplying) return;
-  statusSelect.className="dropdown status-"+statusSelect.value;
+  refreshUI();
 });
 
 document.querySelectorAll(".role-row select").forEach(select=>{
-  const td=select.parentElement;
-  select.addEventListener("change",()=>{
+  select.addEventListener("change", ()=>{
     if(window.isSyncApplying) return;
+    refreshUI();
+  });
+});
+
+/* ===== 顏色重算核心 ===== */
+function refreshUI(){
+  instanceSelect.className = "dropdown instance-" + (instanceSelect.value || "empty");
+  statusSelect.className = "dropdown status-" + (statusSelect.value || "empty");
+
+  roleRows.forEach(row=>{
+    const select=row.querySelector("select");
+    const td=select.parentElement;
     td.className="";
     const map={
       "坦":"role-cell-tank",
@@ -191,9 +220,9 @@ document.querySelectorAll(".role-row select").forEach(select=>{
       "奶坦":"role-cell-ht",
       "輸出奶":"role-cell-dh"
     };
-    if(map[select.value]) td.classList.add(map[select.value]);
+    td.classList.add(map[select.value] || "role-cell-empty");
   });
-});
+}
 
 setNow();
 </script>
@@ -201,6 +230,7 @@ setNow();
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 firebase.initializeApp({
   apiKey:"AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
@@ -211,9 +241,9 @@ firebase.initializeApp({
 </script>
 
 <script>
-/* ========= Cloud Sync Module（穩定版） ========= */
+/* ===== Cloud Sync Module（最終穩定版） ===== */
 (function(){
-  const ref=firebase.database().ref("tables/gameinn-main");
+  const ref = firebase.database().ref("tables/gameinn-main");
   let isApplyingRemote=false;
 
   function collect(){
@@ -229,16 +259,24 @@ firebase.initializeApp({
     });
   }
 
-  ref.on("value",snap=>{
+  ref.on("value", snap=>{
     if(!snap.val()) return;
+
     window.isSyncApplying=true;
     isApplyingRemote=true;
+
     apply(snap.val().data);
-    setTimeout(()=>{window.isSyncApplying=false;isApplyingRemote=false;},0);
+    refreshUI();
+
+    setTimeout(()=>{
+      window.isSyncApplying=false;
+      isApplyingRemote=false;
+    },0);
   });
 
-  document.addEventListener("input",()=>{ if(isApplyingRemote) return;
-    ref.set({data:collect(),updatedAt:Date.now()});
+  document.addEventListener("input", ()=>{
+    if(isApplyingRemote) return;
+    ref.set({ data: collect(), updatedAt: Date.now() });
   });
 })();
 </script>
