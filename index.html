@@ -123,7 +123,7 @@ let countdownSec=0;
 
 /* ★ 完成自動清除控制 */
 let doneAutoResetTimer=null;
-let localDoneTriggered=false;
+let lastStatusValue="open";
 
 const groupDate=document.getElementById("groupDate");
 const weekdayCell=document.getElementById("weekdayCell");
@@ -179,14 +179,14 @@ function stopCountdown(){
   statusSelect.options[0].text="未滿";
 }
 
-/* ★ 不跳確認的一鍵清除（給自動用） */
+/* ★ 不跳確認的一鍵清除（自動 / 手動共用） */
 function silentReset(){
   window.isSyncApplying=true;
 
   stopCountdown();
   clearTimeout(doneAutoResetTimer);
   doneAutoResetTimer=null;
-  localDoneTriggered=false;
+  lastStatusValue="open";
 
   document.querySelectorAll("input,select").forEach(el=>{
     el.type==="checkbox"?el.checked=false:el.value="";
@@ -249,21 +249,18 @@ function applyRules(){
 groupDate.addEventListener("change",updateWeekday);
 instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
 
+/* 本地狀態變更 */
 statusSelect.addEventListener("change",()=>{
   if(window.isSyncApplying)return;
 
-  stopCountdown();
   clearTimeout(doneAutoResetTimer);
-  doneAutoResetTimer=null;
 
-  applyRules();
-
-  if(statusSelect.value==="done"){
-    localDoneTriggered=true;
-    doneAutoResetTimer=setTimeout(()=>{
-      silentReset();
-    },10000);
+  if(statusSelect.value==="done" && lastStatusValue!=="done"){
+    doneAutoResetTimer=setTimeout(silentReset,10000);
   }
+
+  lastStatusValue=statusSelect.value;
+  applyRules();
 });
 
 document.addEventListener("input",()=>{
@@ -312,24 +309,26 @@ function pushToCloud(){
   ref.set({data:collect(),updatedAt:Date.now()});
 }
 
+/* ★ 關鍵：遠端同步也會判斷完成 */
 ref.on("value",snap=>{
   if(!snap.val())return;
   isRemote=true;
   window.isSyncApplying=true;
-
-  /* ★ 關鍵：本地完成倒數中，不清 timer */
-  if(!localDoneTriggered){
-    clearTimeout(doneAutoResetTimer);
-    doneAutoResetTimer=null;
-  }
-
-  stopCountdown();
 
   const data=snap.val().data;
   document.querySelectorAll("input,select").forEach((el,i)=>{
     if(data[i]===undefined)return;
     el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
   });
+
+  const newStatus=statusSelect.value;
+
+  clearTimeout(doneAutoResetTimer);
+  if(newStatus==="done" && lastStatusValue!=="done"){
+    doneAutoResetTimer=setTimeout(silentReset,10000);
+  }
+
+  lastStatusValue=newStatus;
 
   updateWeekday();
   applyRules();
