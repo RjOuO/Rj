@@ -18,7 +18,6 @@ select{text-align-last:center}
 .instance-trial{background:#4da3ff;color:#fff}
 .instance-guild{background:#5a3a1a;color:#fff}
 .instance-mix{background:#b22222;color:#fff}
-.status-empty{background:#e6e6e6}
 .status-open{background:#1e8f4a;color:#fff}
 .status-full{background:#7a1f1f;color:#fff}
 .status-done{background:#000;color:#fff}
@@ -40,11 +39,7 @@ input[type="checkbox"]{transform:scale(1.2)}
 <body>
 
 <table>
-<tr>
-  <td colspan="4">
-    <button class="reset-btn" onclick="confirmReset()">一鍵清除</button>
-  </td>
-</tr>
+<tr><td colspan="4"><button class="reset-btn" onclick="confirmReset()">一鍵清除</button></td></tr>
 
 <tr>
   <td class="title">報團時間</td>
@@ -72,16 +67,11 @@ input[type="checkbox"]{transform:scale(1.2)}
   </td>
   <td>
     <select id="levelSelect" class="dropdown">
-      <option></option>
-      <option>56</option>
-      <option>61</option>
-      <option>66</option>
-      <option>71</option>
+      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
     </select>
   </td>
   <td><input id="leaderId"></td>
   <td>
-    <!-- ⭐ 預設為 未滿 -->
     <select id="statusSelect" class="dropdown status-open">
       <option value="open" selected>未滿</option>
       <option value="full">滿團</option>
@@ -124,23 +114,32 @@ document.write(`
 /* ===== 全域 ===== */
 window.isSyncApplying=false;
 
+const groupDate=document.getElementById("groupDate");
+const weekdayCell=document.getElementById("weekdayCell");
 const instanceSelect=document.getElementById("instanceSelect");
 const statusSelect=document.getElementById("statusSelect");
 const roleRows=document.querySelectorAll(".role-row");
+const weekdays=["日","一","二","三","四","五","六"];
 
-/* ===== 規則引擎 ===== */
+/* ===== 星期計算（修正重點） ===== */
+function updateWeekday(){
+  if(!groupDate.value){
+    weekdayCell.textContent="";
+    return;
+  }
+  const d=new Date(groupDate.value);
+  weekdayCell.textContent="星期"+weekdays[d.getDay()];
+}
+
+/* ===== 規則引擎（v1.3 原樣） ===== */
 function applyRules(){
+  instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
 
-  /* 副本顏色 */
-  instanceSelect.className =
-    "dropdown instance-" + (instanceSelect.value || "empty");
-
-  /* 試劍鎖排 */
   roleRows.forEach((row,i)=>{
     row.classList.remove("trial-locked");
     row.querySelectorAll("input,select").forEach(el=>el.disabled=false);
 
-    if(instanceSelect.value==="trial" && i>=5){
+    if(instanceSelect.value==="trial"&&i>=5){
       row.classList.add("trial-locked");
       row.querySelectorAll("input,select").forEach(el=>{
         el.type==="checkbox"?el.checked=false:el.value="";
@@ -149,27 +148,19 @@ function applyRules(){
     }
   });
 
-  /* 狀態顏色 + 狀態鎖定 */
-  statusSelect.className =
-    "dropdown status-" + (statusSelect.value || "open");
-
-  const isStatusLocked =
-    statusSelect.value==="full" ||
-    statusSelect.value==="done";
+  statusSelect.className="dropdown status-"+(statusSelect.value||"open");
+  const locked=statusSelect.value==="full"||statusSelect.value==="done";
 
   roleRows.forEach(row=>{
     row.classList.remove("role-full","role-done");
-    if(statusSelect.value==="full") row.classList.add("role-full");
-    if(statusSelect.value==="done") row.classList.add("role-done");
+    if(statusSelect.value==="full")row.classList.add("role-full");
+    if(statusSelect.value==="done")row.classList.add("role-done");
 
-    if(isStatusLocked){
-      row.querySelectorAll("input,select").forEach(el=>{
-        el.disabled=true;
-      });
+    if(locked){
+      row.querySelectorAll("input,select").forEach(el=>el.disabled=true);
     }
   });
 
-  /* 定位顏色 */
   roleRows.forEach(row=>{
     const sel=row.querySelector("select");
     const td=sel.parentElement;
@@ -186,6 +177,7 @@ function applyRules(){
 }
 
 /* ===== 事件 ===== */
+groupDate.addEventListener("change",updateWeekday);
 instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
 statusSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
 document.querySelectorAll(".role-row select").forEach(s=>{
@@ -201,12 +193,14 @@ function confirmReset(){
     el.disabled=false;
   });
   statusSelect.value="open";
+  updateWeekday();
   applyRules();
   pushToCloud();
   window.isSyncApplying=false;
 }
 
 applyRules();
+updateWeekday();
 </script>
 
 <!-- Firebase -->
@@ -223,23 +217,21 @@ firebase.initializeApp({
 </script>
 
 <script>
-/* ===== Cloud Sync Module ===== */
+/* ===== Cloud Sync ===== */
 const ref=firebase.database().ref("tables/gameinn-main");
 let isRemote=false;
 
 function collect(){
-  return [...document.querySelectorAll("input,select")].map(el =>
-    el.type==="checkbox"?el.checked:el.value
-  );
+  return [...document.querySelectorAll("input,select")].map(el=>el.type==="checkbox"?el.checked:el.value);
 }
 
 function pushToCloud(){
-  if(isRemote) return;
+  if(isRemote)return;
   ref.set({data:collect(),updatedAt:Date.now()});
 }
 
 ref.on("value",snap=>{
-  if(!snap.val()) return;
+  if(!snap.val())return;
   isRemote=true;
   window.isSyncApplying=true;
 
@@ -249,9 +241,8 @@ ref.on("value",snap=>{
     el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
   });
 
-  /* 若狀態為空，強制視為未滿 */
-  if(!statusSelect.value) statusSelect.value="open";
-
+  if(!statusSelect.value)statusSelect.value="open";
+  updateWeekday();
   applyRules();
 
   setTimeout(()=>{isRemote=false;window.isSyncApplying=false;},0);
