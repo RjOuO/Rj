@@ -113,6 +113,9 @@ document.write(`
 <script>
 /* ===== 全域 ===== */
 window.isSyncApplying=false;
+let countdownTimer=null;
+let countdownInterval=null;
+let countdownSec=0;
 
 const groupDate=document.getElementById("groupDate");
 const weekdayCell=document.getElementById("weekdayCell");
@@ -121,17 +124,56 @@ const statusSelect=document.getElementById("statusSelect");
 const roleRows=document.querySelectorAll(".role-row");
 const weekdays=["日","一","二","三","四","五","六"];
 
-/* ===== 星期計算（修正重點） ===== */
+/* ===== 星期 ===== */
 function updateWeekday(){
-  if(!groupDate.value){
-    weekdayCell.textContent="";
-    return;
-  }
+  if(!groupDate.value){weekdayCell.textContent="";return;}
   const d=new Date(groupDate.value);
   weekdayCell.textContent="星期"+weekdays[d.getDay()];
 }
 
-/* ===== 規則引擎（v1.3 原樣） ===== */
+/* ===== 滿團判斷 ===== */
+function isAllRoleFilled(){
+  return [...roleRows].every(row=>{
+    const id=row.querySelector("td:nth-child(1) input").value.trim();
+    const role=row.querySelector("td:nth-child(2) select").value;
+    return id!=="" && role!=="";
+  });
+}
+
+/* ===== 倒數控制 ===== */
+function startCountdown(){
+  if(countdownInterval || statusSelect.value!=="open") return;
+
+  countdownSec=59;
+  statusSelect.options[0].text=`未滿（${countdownSec}）`;
+
+  countdownInterval=setInterval(()=>{
+    countdownSec--;
+    if(countdownSec>=0){
+      statusSelect.options[0].text=`未滿（${countdownSec}）`;
+    }
+  },1000);
+
+  countdownTimer=setTimeout(()=>{
+    stopCountdown();
+    window.isSyncApplying=true;
+    statusSelect.value="full";
+    applyRules();
+    pushToCloud();
+    window.isSyncApplying=false;
+  },60000);
+}
+
+function stopCountdown(){
+  clearInterval(countdownInterval);
+  clearTimeout(countdownTimer);
+  countdownInterval=null;
+  countdownTimer=null;
+  countdownSec=0;
+  statusSelect.options[0].text="未滿";
+}
+
+/* ===== 規則引擎（原樣） ===== */
 function applyRules(){
   instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
 
@@ -179,15 +221,29 @@ function applyRules(){
 /* ===== 事件 ===== */
 groupDate.addEventListener("change",updateWeekday);
 instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
-statusSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
-document.querySelectorAll(".role-row select").forEach(s=>{
-  s.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
+statusSelect.addEventListener("change",()=>{
+  if(window.isSyncApplying)return;
+  stopCountdown();
+  applyRules();
+});
+
+document.addEventListener("input",()=>{
+  if(window.isSyncApplying)return;
+  isAllRoleFilled()?startCountdown():stopCountdown();
+  pushToCloud();
+});
+
+document.addEventListener("change",()=>{
+  if(window.isSyncApplying)return;
+  isAllRoleFilled()?startCountdown():stopCountdown();
+  pushToCloud();
 });
 
 /* ===== 清除 ===== */
 function confirmReset(){
   if(!confirm("確定要清除目前表格內容嗎？"))return;
   window.isSyncApplying=true;
+  stopCountdown();
   document.querySelectorAll("input,select").forEach(el=>{
     el.type==="checkbox"?el.checked=false:el.value="";
     el.disabled=false;
@@ -234,6 +290,7 @@ ref.on("value",snap=>{
   if(!snap.val())return;
   isRemote=true;
   window.isSyncApplying=true;
+  stopCountdown();
 
   const data=snap.val().data;
   document.querySelectorAll("input,select").forEach((el,i)=>{
@@ -241,15 +298,11 @@ ref.on("value",snap=>{
     el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
   });
 
-  if(!statusSelect.value)statusSelect.value="open";
   updateWeekday();
   applyRules();
 
   setTimeout(()=>{isRemote=false;window.isSyncApplying=false;},0);
 });
-
-document.addEventListener("input",()=>{if(window.isSyncApplying)return;pushToCloud();});
-document.addEventListener("change",()=>{if(window.isSyncApplying)return;pushToCloud();});
 </script>
 
 </body>
