@@ -33,8 +33,6 @@ input[type="checkbox"]{transform:scale(1.2)}
 .role-cell-ht{background:#e3d4f3}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
-
-/* v1.4 既有補丁：置中 */
 #leaderId{text-align:center}
 .role-row td:nth-child(1) input{text-align:center}
 </style>
@@ -43,7 +41,9 @@ input[type="checkbox"]{transform:scale(1.2)}
 <body>
 
 <table>
-<tr><td colspan="4"><button class="reset-btn" onclick="confirmReset()">一鍵清除</button></td></tr>
+<tr><td colspan="4">
+  <button class="reset-btn" onclick="confirmReset()">一鍵清除</button>
+</td></tr>
 
 <tr>
   <td class="title">報團時間</td>
@@ -77,7 +77,7 @@ input[type="checkbox"]{transform:scale(1.2)}
   <td><input id="leaderId"></td>
   <td>
     <select id="statusSelect" class="dropdown status-open">
-      <option value="open" selected>未滿</option>
+      <option value="open">未滿</option>
       <option value="full">滿團</option>
       <option value="done">完成</option>
     </select>
@@ -115,78 +115,56 @@ document.write(`
 </table>
 
 <script>
-/* ===== 全域 ===== */
-window.isSyncApplying=false;
-let countdownTimer=null;
-let countdownInterval=null;
-let countdownSec=0;
+/* ===============================
+   完成（10→0）倒數＋自動清除
+   本地 & 遠端通用
+================================ */
 
-/* ★ 完成自動清除控制 */
-let doneAutoResetTimer=null;
-let lastStatusValue="open";
+let doneSec = 0;
+let doneInterval = null;
+let doneTimer = null;
 
-const groupDate=document.getElementById("groupDate");
-const weekdayCell=document.getElementById("weekdayCell");
-const instanceSelect=document.getElementById("instanceSelect");
-const statusSelect=document.getElementById("statusSelect");
-const roleRows=document.querySelectorAll(".role-row");
-const weekdays=["日","一","二","三","四","五","六"];
+const statusSelect = document.getElementById("statusSelect");
+const doneOption = [...statusSelect.options].find(o => o.value === "done");
 
-function updateWeekday(){
-  if(!groupDate.value){weekdayCell.textContent="";return;}
-  const d=new Date(groupDate.value);
-  weekdayCell.textContent="星期"+weekdays[d.getDay()];
+/* 倒數文字 */
+function updateDoneText(){
+  doneOption.textContent = `完成（${doneSec}）`;
+}
+function resetDoneText(){
+  doneOption.textContent = "完成";
 }
 
-function isAllRoleFilled(){
-  return [...roleRows].every(row=>{
-    const id=row.querySelector("td:nth-child(1) input").value.trim();
-    const role=row.querySelector("td:nth-child(2) select").value;
-    return id!=="" && role!=="";
-  });
-}
+/* 啟動倒數（只要還沒在跑） */
+function startDoneCountdown(){
+  if(doneInterval) return;
 
-/* ===== 原本滿團倒數（不動） ===== */
-function startCountdown(){
-  if(countdownInterval || statusSelect.value!=="open") return;
+  doneSec = 10;
+  updateDoneText();
 
-  countdownSec=59;
-  statusSelect.options[0].text=`未滿（${countdownSec}）`;
-
-  countdownInterval=setInterval(()=>{
-    countdownSec--;
-    if(countdownSec>=0){
-      statusSelect.options[0].text=`未滿（${countdownSec}）`;
-    }
+  doneInterval = setInterval(()=>{
+    doneSec--;
+    updateDoneText();
   },1000);
 
-  countdownTimer=setTimeout(()=>{
-    stopCountdown();
-    window.isSyncApplying=true;
-    statusSelect.value="full";
-    applyRules();
-    pushToCloud();
-    window.isSyncApplying=false;
-  },60000);
+  doneTimer = setTimeout(()=>{
+    stopDoneCountdown();
+    silentReset();
+  },10000);
 }
 
-function stopCountdown(){
-  clearInterval(countdownInterval);
-  clearTimeout(countdownTimer);
-  countdownInterval=null;
-  countdownTimer=null;
-  countdownSec=0;
-  statusSelect.options[0].text="未滿";
+/* 停止倒數 */
+function stopDoneCountdown(){
+  clearInterval(doneInterval);
+  clearTimeout(doneTimer);
+  doneInterval = null;
+  doneTimer = null;
+  resetDoneText();
 }
 
-/* ★ 不跳確認的一鍵清除（自動 / 手動共用） */
+/* 不跳確認的一鍵清除 */
 function silentReset(){
-  window.isSyncApplying=true;
-
-  stopCountdown();
-  clearTimeout(doneAutoResetTimer);
-  doneAutoResetTimer=null;
-  lastStatusValue="open";
+  stopDoneCountdown();
 
   document.querySelectorAll("input,select").forEach(el=>{
     el.type==="checkbox"?el.checked=false:el.value="";
@@ -194,96 +172,39 @@ function silentReset(){
   });
 
   statusSelect.value="open";
-  updateWeekday();
-  applyRules();
   pushToCloud();
-
-  window.isSyncApplying=false;
 }
 
-function applyRules(){
-  instanceSelect.className="dropdown instance-"+(instanceSelect.value||"empty");
-
-  roleRows.forEach((row,i)=>{
-    row.classList.remove("trial-locked");
-    row.querySelectorAll("input,select").forEach(el=>el.disabled=false);
-
-    if(instanceSelect.value==="trial"&&i>=5){
-      row.classList.add("trial-locked");
-      row.querySelectorAll("input,select").forEach(el=>{
-        el.type==="checkbox"?el.checked=false:el.value="";
-        el.disabled=true;
-      });
-    }
-  });
-
-  statusSelect.className="dropdown status-"+(statusSelect.value||"open");
-  const locked=statusSelect.value==="full"||statusSelect.value==="done";
-
-  roleRows.forEach(row=>{
-    row.classList.remove("role-full","role-done");
-    if(statusSelect.value==="full")row.classList.add("role-full");
-    if(statusSelect.value==="done")row.classList.add("role-done");
-
-    if(locked){
-      row.querySelectorAll("input,select").forEach(el=>el.disabled=true);
-    }
-  });
-
-  roleRows.forEach(row=>{
-    const sel=row.querySelector("select");
-    const td=sel.parentElement;
-    td.className="";
-    const map={
-      "坦":"role-cell-tank",
-      "全奶":"role-cell-heal",
-      "輸出":"role-cell-dps",
-      "奶坦":"role-cell-ht",
-      "輸出奶":"role-cell-dh"
-    };
-    td.classList.add(map[sel.value]||"role-cell-empty");
-  });
-}
-
-/* ===== 事件 ===== */
-groupDate.addEventListener("change",updateWeekday);
-instanceSelect.addEventListener("change",()=>{if(window.isSyncApplying)return;applyRules();});
-
-/* 本地狀態變更 */
+/* ===== 本地選狀態 ===== */
 statusSelect.addEventListener("change",()=>{
-  if(window.isSyncApplying)return;
+  stopDoneCountdown();
 
-  clearTimeout(doneAutoResetTimer);
-
-  if(statusSelect.value==="done" && lastStatusValue!=="done"){
-    doneAutoResetTimer=setTimeout(silentReset,10000);
+  if(statusSelect.value==="done"){
+    startDoneCountdown();
   }
 
-  lastStatusValue=statusSelect.value;
-  applyRules();
-});
-
-document.addEventListener("input",()=>{
-  if(window.isSyncApplying)return;
-  isAllRoleFilled()?startCountdown():stopCountdown();
   pushToCloud();
 });
 
-document.addEventListener("change",()=>{
-  if(window.isSyncApplying)return;
-  isAllRoleFilled()?startCountdown():stopCountdown();
-  pushToCloud();
+/* ===== Firebase 同步（遠端一定顯示倒數） ===== */
+ref.on("value",snap=>{
+  if(!snap.val()) return;
+
+  const data = snap.val().data;
+  document.querySelectorAll("input,select").forEach((el,i)=>{
+    if(data[i]===undefined) return;
+    el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
+  });
+
+  stopDoneCountdown();
+
+  if(statusSelect.value==="done"){
+    startDoneCountdown();
+  }
 });
-
-function confirmReset(){
-  if(!confirm("確定要清除目前表格內容嗎？"))return;
-  silentReset();
-}
-
-applyRules();
-updateWeekday();
 </script>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -294,47 +215,17 @@ firebase.initializeApp({
   databaseURL:"https://rjgame-582d0-default-rtdb.firebaseio.com",
   projectId:"rjgame-582d0"
 });
-</script>
 
-<script>
-const ref=firebase.database().ref("tables/gameinn-main");
-let isRemote=false;
+const ref = firebase.database().ref("tables/gameinn-main");
 
 function collect(){
-  return [...document.querySelectorAll("input,select")].map(el=>el.type==="checkbox"?el.checked:el.value);
+  return [...document.querySelectorAll("input,select")]
+    .map(el=>el.type==="checkbox"?el.checked:el.value);
 }
 
 function pushToCloud(){
-  if(isRemote)return;
   ref.set({data:collect(),updatedAt:Date.now()});
 }
-
-/* ★ 關鍵：遠端同步也會判斷完成 */
-ref.on("value",snap=>{
-  if(!snap.val())return;
-  isRemote=true;
-  window.isSyncApplying=true;
-
-  const data=snap.val().data;
-  document.querySelectorAll("input,select").forEach((el,i)=>{
-    if(data[i]===undefined)return;
-    el.type==="checkbox"?el.checked=data[i]:el.value=data[i];
-  });
-
-  const newStatus=statusSelect.value;
-
-  clearTimeout(doneAutoResetTimer);
-  if(newStatus==="done" && lastStatusValue!=="done"){
-    doneAutoResetTimer=setTimeout(silentReset,10000);
-  }
-
-  lastStatusValue=newStatus;
-
-  updateWeekday();
-  applyRules();
-
-  setTimeout(()=>{isRemote=false;window.isSyncApplying=false;},0);
-});
 </script>
 
 </body>
