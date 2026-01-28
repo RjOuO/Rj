@@ -2,16 +2,20 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表 v1.1</title>
+<title>遊戲旅舍報團專用表</title>
 
 <style>
-/* ===（CSS 完全沿用 v1.0，未修改）=== */
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   background: #f5f5f5;
   padding: 30px;
 }
-table { border-collapse: collapse; background: #fff; }
+
+table {
+  border-collapse: collapse;
+  background: #fff;
+}
+
 td, th {
   border: 2px solid #000;
   padding: 6px;
@@ -19,9 +23,11 @@ td, th {
   font-size: 18px;
   vertical-align: middle;
 }
+
 .title { background: #fff200; font-weight: bold; }
 .header { background: #ffe8b0; font-weight: bold; }
 .gray-cell { background: #e0e0e0; font-weight: bold; }
+
 .dropdown {
   width: 100%;
   border-radius: 999px;
@@ -29,6 +35,8 @@ td, th {
   border: none;
   cursor: pointer;
 }
+
+/* input / select 置中 */
 td > select,
 td > input[type="text"],
 td > input[type="date"],
@@ -37,27 +45,57 @@ td > input[type="time"] {
   margin: 0 auto;
   text-align: center;
 }
-select { text-align-last: center; }
 
-/* 副本 */
+select {
+  text-align-last: center;
+}
+
+/* 副本顏色（選取後） */
 .instance-empty { background: #e6e6e6; }
 .instance-normal { background: #c8f0c2; }
 .instance-trial { background: #4da3ff; color: #fff; }
 .instance-guild { background: #5a3a1a; color: #fff; }
 .instance-mix { background: #b22222; color: #fff; }
 
-/* 狀態 */
+/* 副本 option 底色 */
+#instanceSelect option:nth-child(1) { background-color: #ffffff; }
+#instanceSelect option:nth-child(2) { background-color: #c8f0c2; }
+#instanceSelect option:nth-child(3) { background-color: #4da3ff; color: #fff; }
+#instanceSelect option:nth-child(4) { background-color: #5a3a1a; color: #fff; }
+#instanceSelect option:nth-child(5) { background-color: #b22222; color: #fff; }
+
+/* 狀態顏色（選取後） */
 .status-empty { background: #e6e6e6; }
 .status-open { background: #1e8f4a; color: #fff; }
 .status-full { background: #c0392b; color: #fff; }
 .status-done { background: #000; color: #fff; }
 
+/* 狀態 option 底色 */
+#statusSelect option:nth-child(1) { background-color: #ffffff; }
+#statusSelect option:nth-child(2) { background-color: #1e8f4a; color: #fff; }
+#statusSelect option:nth-child(3) { background-color: #c0392b; color: #fff; }
+#statusSelect option:nth-child(4) { background-color: #000000; color: #fff; }
+
+/* 角色狀態 */
 .role-full td { background: #7a1f1f; color: #fff; }
 .role-done td { background: #4a4a4a; color: #fff; }
-.trial-locked td { background: #000 !important; color: #fff !important; }
 
-input[type="checkbox"] { transform: scale(1.2); }
-input { border: none; outline: none; background: transparent; }
+/* 試劍鎖定 */
+.trial-locked td {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+}
 
 .reset-btn {
   padding: 8px 20px;
@@ -68,6 +106,16 @@ input { border: none; outline: none; background: transparent; }
   cursor: pointer;
 }
 
+/* 定位 option 底色 */
+.role-row select option:nth-child(1) { background-color: #ffffff; }
+.role-row select option:nth-child(2) { background-color: #f6c1c1; }
+.role-row select option:nth-child(3) { background-color: #cdeecb; }
+.role-row select option:nth-child(4) { background-color: #cfe8ff; }
+.role-row select option:nth-child(5) { background-color: #e3d4f3; }
+.role-row select option:nth-child(6) { background-color: #e6e6e6; }
+
+/* 定位欄位顯示底色 */
+.role-cell-empty { background: #ffffff; }
 .role-cell-tank { background: #f6c1c1; }
 .role-cell-heal { background: #cdeecb; }
 .role-cell-dps { background: #cfe8ff; }
@@ -78,7 +126,8 @@ input { border: none; outline: none; background: transparent; }
 
 <body>
 
-<table id="groupTable">
+<table>
+
 <tr>
   <td colspan="4">
     <button class="reset-btn" onclick="confirmReset()">一鍵清除</button>
@@ -111,7 +160,11 @@ input { border: none; outline: none; background: transparent; }
   </td>
   <td>
     <select id="levelSelect" class="dropdown">
-      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
+      <option></option>
+      <option>56</option>
+      <option>61</option>
+      <option>66</option>
+      <option>71</option>
     </select>
   </td>
   <td><input type="text" id="leaderId"></td>
@@ -139,8 +192,12 @@ for (let i = 0; i < 10; i++) {
     <td><input></td>
     <td>
       <select class="dropdown">
-        <option></option><option>坦</option><option>全奶</option>
-        <option>輸出</option><option>奶坦</option><option>輸出奶</option>
+        <option></option>
+        <option>坦</option>
+        <option>全奶</option>
+        <option>輸出</option>
+        <option>奶坦</option>
+        <option>輸出奶</option>
       </select>
     </td>
     <td><input type="checkbox"></td>
@@ -148,46 +205,171 @@ for (let i = 0; i < 10; i++) {
   </tr>`);
 }
 </script>
+
 </table>
 
 <script>
-/* =====================
-   v1.1 記憶功能核心
-===================== */
-const STORAGE_KEY = "groupTable_v1_1";
+const groupDate = document.getElementById("groupDate");
+const groupTime = document.getElementById("groupTime");
+const weekdayCell = document.getElementById("weekdayCell");
+const instanceSelect = document.getElementById("instanceSelect");
+const statusSelect = document.getElementById("statusSelect");
+const roleRows = document.querySelectorAll(".role-row");
+const leaderId = document.getElementById("leaderId");
+const levelSelect = document.getElementById("levelSelect");
 
-/* 儲存 */
-function saveData() {
-  const data = [];
-  document.querySelectorAll("input, select").forEach(el => {
-    data.push(el.type === "checkbox" ? el.checked : el.value);
-  });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+const weekdays = ["日","一","二","三","四","五","六"];
+
+function updateWeekday() {
+  if (!groupDate.value) {
+    weekdayCell.textContent = "";
+    return;
+  }
+  const d = new Date(groupDate.value);
+  weekdayCell.textContent = "星期" + weekdays[d.getDay()];
 }
 
-/* 還原 */
-function loadData() {
-  const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  document.querySelectorAll("input, select").forEach((el, i) => {
-    if (data[i] !== undefined) {
-      el.type === "checkbox" ? el.checked = data[i] : el.value = data[i];
+function setNow() {
+  const n = new Date();
+  groupDate.value = n.toISOString().split("T")[0];
+  groupTime.value =
+    String(n.getHours()).padStart(2,"0") + ":" +
+    String(n.getMinutes()).padStart(2,"0");
+  updateWeekday();
+}
+
+function confirmReset() {
+  if (confirm("確定要清除目前表格內容嗎？")) resetForm();
+}
+
+function resetForm() {
+  setNow();
+  instanceSelect.value = "";
+  statusSelect.value = "";
+  instanceSelect.className = "dropdown instance-empty";
+  statusSelect.className = "dropdown status-empty";
+  leaderId.value = "";
+  levelSelect.value = "";
+
+  roleRows.forEach(row => {
+    row.className = "role-row";
+    row.querySelectorAll("input,select").forEach(el => {
+      el.disabled = false;
+      el.type === "checkbox" ? el.checked = false : el.value = "";
+    });
+  });
+}
+
+groupDate.addEventListener("change", updateWeekday);
+
+instanceSelect.addEventListener("change", () => {
+  instanceSelect.className = "dropdown instance-" + instanceSelect.value;
+
+  roleRows.forEach((row, i) => {
+    row.classList.remove("trial-locked");
+    row.querySelectorAll("input,select").forEach(el => el.disabled = false);
+
+    if (instanceSelect.value === "trial" && i >= 5) {
+      row.classList.add("trial-locked");
+      row.querySelectorAll("input,select").forEach(el => {
+        el.type === "checkbox" ? el.checked = false : el.value = "";
+        el.disabled = true;
+      });
     }
   });
-}
+});
 
-/* 綁定所有輸入 */
-document.addEventListener("input", saveData);
-document.addEventListener("change", saveData);
+statusSelect.addEventListener("change", () => {
+  statusSelect.className = "dropdown status-" + statusSelect.value;
+  roleRows.forEach(row => {
+    row.classList.remove("role-full","role-done");
+    if (statusSelect.value === "full") row.classList.add("role-full");
+    if (statusSelect.value === "done") row.classList.add("role-done");
+  });
+});
 
-/* 清除 */
-function confirmReset() {
-  if (confirm("確定要清除目前表格內容嗎？")) {
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
+document.querySelectorAll(".role-row select").forEach(select => {
+  const td = select.parentElement;
+  select.addEventListener("change", () => {
+    td.className = "";
+    switch (select.value) {
+      case "坦": td.classList.add("role-cell-tank"); break;
+      case "全奶": td.classList.add("role-cell-heal"); break;
+      case "輸出": td.classList.add("role-cell-dps"); break;
+      case "奶坦": td.classList.add("role-cell-ht"); break;
+      case "輸出奶": td.classList.add("role-cell-dh"); break;
+      default: td.classList.add("role-cell-empty");
+    }
+  });
+});
+
+setNow();
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAhGIn-RLMZVNFhLgQbHUpSzYn5M4M4gEQ",
+  authDomain: "rjgame-582d0.firebaseapp.com",
+  databaseURL: "https://rjgame-582d0-default-rtdb.firebaseio.com",
+  projectId: "rjgame-582d0",
+  storageBucket: "rjgame-582d0.appspot.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+</script>
+<script>
+/* =========================
+   Cloud Sync Module
+   v1.0 compatible
+   ========================= */
+
+(function () {
+
+  const db = firebase.database();
+
+  /* 同一個 key = 同一張表 */
+  const SYNC_KEY = "gameinn-main";
+  const ref = db.ref("tables/" + SYNC_KEY);
+
+  /* 收集目前表格資料 */
+  function collectData() {
+    const data = [];
+    document.querySelectorAll("input, select").forEach(el => {
+      data.push(el.type === "checkbox" ? el.checked : el.value);
+    });
+    return data;
   }
-}
 
-window.onload = loadData;
+  /* 套用雲端資料到表格 */
+  function applyData(data) {
+    document.querySelectorAll("input, select").forEach((el, i) => {
+      if (data[i] === undefined) return;
+      el.type === "checkbox"
+        ? el.checked = data[i]
+        : el.value = data[i];
+    });
+  }
+
+  /* 雲端 → 本地（即時監聽） */
+  ref.on("value", snapshot => {
+    const val = snapshot.val();
+    if (!val || !val.data) return;
+    applyData(val.data);
+  });
+
+  /* 本地 → 雲端（任何變動就寫） */
+  function pushToCloud() {
+    ref.set({
+      updatedAt: Date.now(),
+      data: collectData()
+    });
+  }
+
+  document.addEventListener("input", pushToCloud);
+  document.addEventListener("change", pushToCloud);
+
+})();
 </script>
 
 </body>
