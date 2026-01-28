@@ -22,7 +22,6 @@ td, th {
   text-align: center;
 }
 
-/* 倒數提示（不影響內文） */
 #clearCountdown {
   display: none;
   margin-top: 6px;
@@ -46,7 +45,6 @@ td, th {
         <option value="進行中">進行中</option>
         <option value="完成">完成</option>
       </select>
-      <!-- 新增：倒數提示（不屬於內文資料） -->
       <div id="clearCountdown"></div>
     </td>
   </tr>
@@ -79,65 +77,67 @@ td, th {
 <button onclick="clearAllData()">一鍵清除</button>
 
 <script>
-/* ===== v1.3.1 行為擴充（不動內文） ===== */
+/* ===== v1.3.1：完成狀態倒數自動清除（保證觸發） ===== */
 
-let autoClearTimer = null;
-let countdownTimer = null;
-let remainingSeconds = 60;
+document.addEventListener("DOMContentLoaded", () => {
 
-const statusSelect = document.getElementById("statusSelect");
-const countdownEl = document.getElementById("clearCountdown");
+  let autoClearTimer = null;
+  let countdownTimer = null;
+  let remainingSeconds = 60;
 
-/* 原本的一鍵清除（v1.3.1 行為） */
-function clearAllData() {
-  document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (el.tagName === "SELECT") {
-      el.selectedIndex = 0;
-    } else {
-      el.value = "";
+  const statusSelect = document.getElementById("statusSelect");
+  const countdownEl = document.getElementById("clearCountdown");
+
+  function stopCountdown() {
+    if (autoClearTimer) {
+      clearTimeout(autoClearTimer);
+      autoClearTimer = null;
+    }
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+    countdownEl.style.display = "none";
+  }
+
+  function clearAllData() {
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.tagName === "SELECT") {
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+      }
+    });
+    stopCountdown();
+  }
+
+  function startCountdown() {
+    remainingSeconds = 60;
+    countdownEl.style.display = "block";
+    countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
+
+    countdownTimer = setInterval(() => {
+      remainingSeconds--;
+      countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
+      if (remainingSeconds <= 0) {
+        clearInterval(countdownTimer);
+      }
+    }, 1000);
+
+    autoClearTimer = setTimeout(() => {
+      clearAllData();
+    }, 60000);
+  }
+
+  statusSelect.addEventListener("change", () => {
+    stopCountdown();
+    if (statusSelect.value === "完成") {
+      startCountdown();
     }
   });
-  stopCountdown();
-}
 
-/* 停止倒數 */
-function stopCountdown() {
-  if (autoClearTimer) {
-    clearTimeout(autoClearTimer);
-    autoClearTimer = null;
-  }
-  if (countdownTimer) {
-    clearInterval(countdownTimer);
-    countdownTimer = null;
-  }
-  countdownEl.style.display = "none";
-}
-
-/* 啟動 60 秒倒數 */
-function startCountdown() {
-  remainingSeconds = 60;
-  countdownEl.style.display = "block";
-  countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
-
-  countdownTimer = setInterval(() => {
-    remainingSeconds--;
-    countdownEl.textContent = `${remainingSeconds} 秒後將自動清除`;
-    if (remainingSeconds <= 0) {
-      clearInterval(countdownTimer);
-    }
-  }, 1000);
-
-  autoClearTimer = setTimeout(() => {
-    clearAllData();
-  }, 60000);
-}
-
-/* 狀態變更監聽 */
-statusSelect.addEventListener("change", () => {
-  stopCountdown();
-  if (statusSelect.value === "完成") {
-    startCountdown();
-  }
+  // 讓外部按鈕可呼叫
+  window.clearAllData = clearAllData;
 });
 </script>
 
