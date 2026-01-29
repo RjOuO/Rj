@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版）</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.8</title>
 
 <style>
 body{
@@ -11,9 +11,9 @@ body{
   padding:30px
 }
 
-/* 整體縮放 85% */
+/* 整體縮放 70%（沿用 v1.4.7） */
 .scale-wrapper{
-  transform:scale(0.85);
+  transform:scale(0.7);
   transform-origin:top left;
 }
 
@@ -24,7 +24,32 @@ body{
 }
 
 table{border-collapse:collapse;background:#fff}
-td,th{border:2px solid #000;padding:6px;text-align:center;font-size:18px}
+
+/* 🔹 第 2 點：表格內所有字體 = 星期格（18px） */
+td,th{
+  border:2px solid #000;
+  padding:6px;
+  text-align:center;
+  font-size:18px;
+}
+
+input,
+select{
+  border:none;
+  background:transparent;
+  font-size:18px;
+}
+
+.reset-btn{
+  padding:8px 20px;
+  border-radius:999px;
+  border:none;
+  background:#444;
+  color:#fff;
+  cursor:pointer;
+  font-size:18px;
+}
+/* 🔹 第 2 點結束 */
 
 .title{background:#fff200;font-weight:bold}
 .header{background:#ffe8b0;font-weight:bold}
@@ -47,19 +72,9 @@ select{text-align-last:center}
 .role-done td{background:#4a4a4a;color:#fff}
 .trial-locked td{background:#000!important;color:#fff!important}
 
-input{border:none;background:transparent}
 input[type="checkbox"]{transform:scale(1.2)}
 
-.reset-btn{
-  padding:8px 20px;
-  border-radius:999px;
-  border:none;
-  background:#444;
-  color:#fff;
-  cursor:pointer
-}
-
-/* 24H 時間輸入 */
+/* 24H 時間輸入（沿用） */
 .time-input{
   text-align:center;
   letter-spacing:1px;
@@ -112,13 +127,7 @@ for(let t=1;t<=9;t++){
   <td><input type="date"></td>
   <td class="gray-cell"></td>
   <td>
-    <input
-      type="text"
-      class="time-input"
-      placeholder="HH:MM"
-      maxlength="5"
-      inputmode="numeric"
-    >
+    <input type="text" class="time-input" placeholder="HH:MM" maxlength="5" inputmode="numeric">
   </td>
 </tr>
 
@@ -196,7 +205,6 @@ function initTable(root,index){
   const status=root.querySelectorAll("select")[2];
   const reset=root.querySelector(".reset-btn");
 
-  /* 24H 時間強制格式 */
   time.addEventListener("input",()=>{
     let v=time.value.replace(/[^\d]/g,"");
     if(v.length>=3) v=v.slice(0,2)+":"+v.slice(2,4);
@@ -288,6 +296,7 @@ function initTable(root,index){
     updateWeekday();
     isRemote=false;
   });
+
   applyRules();
 }
 </script>
