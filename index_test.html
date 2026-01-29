@@ -11,7 +11,6 @@ body{
   padding:30px
 }
 
-/* ===== TEST MODE 視覺防呆 ===== */
 body::before{
   content:"TEST MODE";
   position:fixed;
@@ -24,9 +23,7 @@ body::before{
   z-index:9999;
   border-radius:6px;
 }
-/* ============================= */
 
-/* 整體縮放 70%（沿用 v1.4.7） */
 .scale-wrapper{
   transform:scale(0.7);
   transform-origin:top left;
@@ -40,7 +37,6 @@ body::before{
 
 table{border-collapse:collapse;background:#fff}
 
-/* 表格內所有字體 */
 td,th{
   border:2px solid #000;
   padding:6px;
@@ -48,17 +44,13 @@ td,th{
   font-size:18px;
 }
 
-input,
-select{
+input,select{
   border:none;
   background:transparent;
   font-size:18px;
 }
 
-/* 角色ID、隊長ID 文字輸入置中 */
-input:not([type="checkbox"]){
-  text-align:center;
-}
+input:not([type="checkbox"]){text-align:center}
 
 .reset-btn{
   padding:8px 20px;
@@ -74,7 +66,13 @@ input:not([type="checkbox"]){
 .header{background:#ffe8b0;font-weight:bold}
 .gray-cell{background:#e0e0e0;font-weight:bold}
 
-.dropdown{width:100%;border-radius:999px;padding:4px 20px;border:none}
+.dropdown{
+  width:100%;
+  border-radius:999px;
+  padding:4px 20px;
+  border:none
+}
+
 select{text-align-last:center}
 
 .instance-empty{background:#e6e6e6}
@@ -92,11 +90,6 @@ select{text-align-last:center}
 .trial-locked td{background:#000!important;color:#fff!important}
 
 input[type="checkbox"]{transform:scale(1.2)}
-
-.time-input{
-  text-align:center;
-  letter-spacing:1px;
-}
 
 .role-cell-tank{background:#f6c1c1}
 .role-cell-heal{background:#cdeecb}
@@ -117,7 +110,6 @@ input[type="checkbox"]{transform:scale(1.2)}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-/* ===== Firebase TEST 專案 ===== */
 firebase.initializeApp({
   apiKey:"AIzaSyBoU4Jd1lzrncVc9MV2Y0tHpcJDSW96lgE",
   authDomain:"rjgame-test.firebaseapp.com",
@@ -131,23 +123,28 @@ const weekdays=["日","一","二","三","四","五","六"];
 const grid=document.getElementById("grid");
 const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
 
+function generateTimeOptions(){
+  let html='<option value=""></option>';
+  for(let h=0;h<24;h++){
+    const hh=String(h).padStart(2,"0");
+    html+=`<option>${hh}:00</option><option>${hh}:30</option>`;
+  }
+  return html;
+}
+
 for(let t=1;t<=9;t++){
   const wrap=document.createElement("div");
   wrap.innerHTML=`
 <table>
 <tr>
-  <td colspan="4">
-    <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
-  </td>
+  <td colspan="4"><button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button></td>
 </tr>
 
 <tr>
   <td class="title">報團時間</td>
   <td><input type="date"></td>
   <td class="gray-cell"></td>
-  <td>
-    <input type="text" class="time-input" placeholder="HH:MM" maxlength="5" inputmode="numeric">
-  </td>
+  <td><select class="dropdown time-select">${generateTimeOptions()}</select></td>
 </tr>
 
 <tr>
@@ -160,7 +157,7 @@ for(let t=1;t<=9;t++){
 <tr>
   <td>
     <select class="dropdown instance-empty">
-      <option></option>
+      <option value=""></option>
       <option value="normal">一般10人俠境</option>
       <option value="trial">試劍</option>
       <option value="guild">百業10人俠境</option>
@@ -169,13 +166,13 @@ for(let t=1;t<=9;t++){
   </td>
   <td>
     <select class="dropdown">
-      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
+      <option value=""></option><option>56</option><option>61</option><option>66</option><option>71</option>
     </select>
   </td>
   <td><input></td>
   <td>
     <select class="dropdown status-open">
-      <option value="open" selected>未滿</option>
+      <option value="open">未滿</option>
       <option value="full">滿團</option>
       <option value="done">完成</option>
     </select>
@@ -204,8 +201,7 @@ ${Array.from({length:10}).map(()=>`
   </td>
   <td><input type="checkbox"></td>
   <td><input></td>
-</tr>
-`).join("")}
+</tr>`).join("")}
 </table>`;
   grid.appendChild(wrap);
   initTable(wrap,t);
@@ -218,33 +214,21 @@ function initTable(root,index){
   const inputs=root.querySelectorAll("input,select");
   const rows=root.querySelectorAll(".role-row");
   const date=root.querySelector("input[type=date]");
-  const time=root.querySelector(".time-input");
   const weekday=root.querySelector(".gray-cell");
-  const instance=root.querySelector("select");
-  const status=root.querySelectorAll("select")[2];
+  const instance=root.querySelector("select.instance-empty");
+  const status=root.querySelector("select.status-open");
   const reset=root.querySelector(".reset-btn");
 
-  time.addEventListener("input",()=>{
-    let v=time.value.replace(/[^\d]/g,"");
-    if(v.length>=3) v=v.slice(0,2)+":"+v.slice(2,4);
-    time.value=v.slice(0,5);
-  });
-
-  time.addEventListener("blur",()=>{
-    if(!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time.value)){
-      time.value="";
-    }
-  });
+  if(!status.value) status.value="open";
 
   function updateWeekday(){
     if(!date.value){weekday.textContent="";return;}
-    const d=new Date(date.value);
-    weekday.textContent="星期"+weekdays[d.getDay()];
+    weekday.textContent="星期"+weekdays[new Date(date.value).getDay()];
   }
 
   function applyRules(){
     instance.className="dropdown instance-"+(instance.value||"empty");
-    status.className="dropdown status-"+(status.value||"open");
+    status.className="dropdown status-"+status.value;
 
     rows.forEach((r,i)=>{
       r.classList.remove("trial-locked","role-full","role-done");
@@ -265,15 +249,7 @@ function initTable(root,index){
 
       const sel=r.querySelector("td:nth-child(2) select");
       const td=sel.parentElement;
-      td.className="";
-      const map={
-        "坦":"role-cell-tank",
-        "全奶":"role-cell-heal",
-        "輸出":"role-cell-dps",
-        "奶坦":"role-cell-ht",
-        "輸出奶":"role-cell-dh"
-      };
-      td.classList.add(map[sel.value]||"role-cell-empty");
+      td.className=( {"坦":"role-cell-tank","全奶":"role-cell-heal","輸出":"role-cell-dps","奶坦":"role-cell-ht","輸出奶":"role-cell-dh"}[sel.value] || "role-cell-empty");
     });
   }
 
@@ -287,20 +263,14 @@ function initTable(root,index){
   }
 
   inputs.forEach(el=>{
-    el.addEventListener("input",()=>{updateWeekday();applyRules();push();});
     el.addEventListener("change",()=>{updateWeekday();applyRules();push();});
   });
 
   reset.onclick=()=>{
     if(!confirm("確定要清除目前團隊內容嗎？"))return;
-    inputs.forEach(el=>{
-      el.type==="checkbox"?el.checked=false:el.value="";
-      el.disabled=false;
-    });
+    inputs.forEach(el=>{el.type==="checkbox"?el.checked=false:el.value="";el.disabled=false});
     status.value="open";
-    applyRules();
-    updateWeekday();
-    push();
+    applyRules();updateWeekday();push();
   };
 
   ref.on("value",snap=>{
@@ -308,11 +278,10 @@ function initTable(root,index){
     isRemote=true;
     snap.val().data.forEach((v,i)=>{
       const el=inputs[i];
-      if(!el)return;
-      el.type==="checkbox"?el.checked=v:el.value=v;
+      if(el) el.type==="checkbox"?el.checked=v:el.value=v;
     });
-    applyRules();
-    updateWeekday();
+    if(!status.value) status.value="open";
+    applyRules();updateWeekday();
     isRemote=false;
   });
 
