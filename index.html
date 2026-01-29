@@ -25,7 +25,7 @@ body{
 
 table{border-collapse:collapse;background:#fff}
 
-/* 🔹 第 2 點：表格內所有字體 = 星期格（18px） */
+/* 表格內所有字體 */
 td,th{
   border:2px solid #000;
   padding:6px;
@@ -40,6 +40,11 @@ select{
   font-size:18px;
 }
 
+/* ✅【唯一新增修改】角色ID、隊長ID 文字輸入置中 */
+input:not([type="checkbox"]){
+  text-align:center;
+}
+
 .reset-btn{
   padding:8px 20px;
   border-radius:999px;
@@ -49,7 +54,6 @@ select{
   cursor:pointer;
   font-size:18px;
 }
-/* 🔹 第 2 點結束 */
 
 .title{background:#fff200;font-weight:bold}
 .header{background:#ffe8b0;font-weight:bold}
@@ -74,7 +78,6 @@ select{text-align-last:center}
 
 input[type="checkbox"]{transform:scale(1.2)}
 
-/* 24H 時間輸入（沿用） */
 .time-input{
   text-align:center;
   letter-spacing:1px;
