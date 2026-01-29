@@ -124,12 +124,6 @@ firebase.initializeApp({
   databaseURL:"https://rjgame-test-default-rtdb.firebaseio.com",
   projectId:"rjgame-test"
 });
-
-/* 防呆：測試頁誤連正式就中止 */
-if (!firebase.app().options.projectId.includes("test")) {
-  alert("⚠️ 測試頁連到了正式 Firebase，已中止");
-  throw new Error("Firebase Project mismatch");
-}
 </script>
 
 <script>
@@ -137,22 +131,82 @@ const weekdays=["日","一","二","三","四","五","六"];
 const grid=document.getElementById("grid");
 const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
 
-function generateMonthDayOptions() {
-  let options = '<option value=""></option>';
-  const currentYear = new Date().getFullYear();
-  for (let month = 1; month <= 12; month++) {
-    const lastDay = new Date(currentYear, month, 0).getDate();
-    for (let day = 1; day <= lastDay; day++) {
-      const value = `${month}/${day}`;
-      options += `<option value="${value}">${value}</option>`;
-    }
-  }
-  return options;
-}
-
 for(let t=1;t<=9;t++){
   const wrap=document.createElement("div");
-  wrap.innerHTML=`<table> ... </table>`;
+  wrap.innerHTML=`
+<table>
+<tr>
+  <td colspan="4">
+    <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
+  </td>
+</tr>
+
+<tr>
+  <td class="title">報團時間</td>
+  <td><input type="date"></td>
+  <td class="gray-cell"></td>
+  <td>
+    <input type="text" class="time-input" placeholder="HH:MM" maxlength="5" inputmode="numeric">
+  </td>
+</tr>
+
+<tr>
+  <td class="header">選擇副本</td>
+  <td class="header">等級</td>
+  <td class="header">隊長ID</td>
+  <td class="header">狀態</td>
+</tr>
+
+<tr>
+  <td>
+    <select class="dropdown instance-empty">
+      <option></option>
+      <option value="normal">一般10人俠境</option>
+      <option value="trial">試劍</option>
+      <option value="guild">百業10人俠境</option>
+      <option value="mix">百業+一般俠境</option>
+    </select>
+  </td>
+  <td>
+    <select class="dropdown">
+      <option></option><option>56</option><option>61</option><option>66</option><option>71</option>
+    </select>
+  </td>
+  <td><input></td>
+  <td>
+    <select class="dropdown status-open">
+      <option value="open" selected>未滿</option>
+      <option value="full">滿團</option>
+      <option value="done">完成</option>
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td class="header">角色ID</td>
+  <td class="header">定位</td>
+  <td class="header">DC語音</td>
+  <td class="header">備註</td>
+</tr>
+
+${Array.from({length:10}).map(()=>`
+<tr class="role-row">
+  <td><input></td>
+  <td>
+    <select class="dropdown">
+      <option></option>
+      <option>坦</option>
+      <option>全奶</option>
+      <option>輸出</option>
+      <option>奶坦</option>
+      <option>輸出奶</option>
+    </select>
+  </td>
+  <td><input type="checkbox"></td>
+  <td><input></td>
+</tr>
+`).join("")}
+</table>`;
   grid.appendChild(wrap);
   initTable(wrap,t);
 }
@@ -163,7 +217,7 @@ function initTable(root,index){
 
   const inputs=root.querySelectorAll("input,select");
   const rows=root.querySelectorAll(".role-row");
-  const monthDaySelect = root.querySelector(".month-day-select");
+  const date=root.querySelector("input[type=date]");
   const time=root.querySelector(".time-input");
   const weekday=root.querySelector(".gray-cell");
   const instance=root.querySelector("select");
@@ -183,10 +237,8 @@ function initTable(root,index){
   });
 
   function updateWeekday(){
-    if(!monthDaySelect.value){weekday.textContent="";return;}
-    const [month, day] = monthDaySelect.value.split("/").map(Number);
-    const currentYear = new Date().getFullYear();
-    const d=new Date(currentYear, month - 1, day);
+    if(!date.value){weekday.textContent="";return;}
+    const d=new Date(date.value);
     weekday.textContent="星期"+weekdays[d.getDay()];
   }
 
@@ -210,6 +262,18 @@ function initTable(root,index){
         r.classList.add(status.value==="full"?"role-full":"role-done");
         r.querySelectorAll("td:nth-child(-n+3) input,select").forEach(el=>el.disabled=true);
       }
+
+      const sel=r.querySelector("td:nth-child(2) select");
+      const td=sel.parentElement;
+      td.className="";
+      const map={
+        "坦":"role-cell-tank",
+        "全奶":"role-cell-heal",
+        "輸出":"role-cell-dps",
+        "奶坦":"role-cell-ht",
+        "輸出奶":"role-cell-dh"
+      };
+      td.classList.add(map[sel.value]||"role-cell-empty");
     });
   }
 
