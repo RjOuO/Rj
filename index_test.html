@@ -45,31 +45,35 @@ body::before{
   height:62px;
   border-radius:50%;
   border:none;
+  background:#555;
   color:#fff;
   font-size:25px;
   font-weight:bold;
-  cursor:pointer;
-  transition:background .15s
+  cursor:pointer
 }
-.floating-nav button:hover{filter:brightness(.9)}
+.floating-nav button:hover{background:#000}
 
-/* 狀態色（團用） */
-.nav-open{background:#1e8f4a}
-.nav-full{background:#f6c1c1;color:#000}
-.nav-done{background:#000}
-
-/* ↑ 固定色 */
-.nav-top{
-  background:#bdbdbd;
-  color:#000
+/* =====【關鍵修正：狀態色最終覆蓋】===== */
+.floating-nav button.nav-open{
+  background:#1e8f4a !important
+}
+.floating-nav button.nav-full{
+  background:#f6c1c1 !important;
+  color:#000 !important
+}
+.floating-nav button.nav-done{
+  background:#000 !important
+}
+.floating-nav button.nav-top{
+  background:#bdbdbd !important;
+  color:#000 !important
 }
 
-/* 表格 */
+/* ===== 表格樣式（原封不動） ===== */
 table{border-collapse:collapse;background:#fff;table-layout:fixed}
 td,th{border:2px solid #000;padding:10px;text-align:center;font-size:22px}
 table tr td:nth-child(3),table tr th:nth-child(3){width:200px}
 table tr td:nth-child(3) input{max-width:180px}
-
 input,select{border:none;background:transparent;font-size:22px;text-align:center}
 input[type="checkbox"]{transform:scale(1.4)}
 
@@ -141,7 +145,7 @@ const weekdays=["日","一","二","三","四","五","六"];
 const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
 const grid=document.getElementById("grid");
 
-/* ===== 懸浮導覽 ===== */
+/* 捲動 */
 function scrollToGroup(n){
   document.getElementById("group-"+n)?.scrollIntoView({behavior:"smooth"});
 }
@@ -149,30 +153,25 @@ function scrollToTop(){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
+/* ===== 懸浮按鈕 ===== */
 const floatingNav=document.getElementById("floatingNav");
 
-/* 1~9 團 */
 for(let i=1;i<=9;i++){
   const btn=document.createElement("button");
   btn.textContent=i;
-  btn.classList.add("nav-open");
   btn.onclick=()=>scrollToGroup(i);
   floatingNav.appendChild(btn);
 
   db.ref("test/groups/"+i+"/header/status").on("value",s=>{
     const v=s.val()||"open";
     btn.classList.remove("nav-open","nav-full","nav-done");
-    if(v==="full"){
-      btn.classList.add("nav-full");
-    }else if(v==="done"){
-      btn.classList.add("nav-done");
-    }else{
-      btn.classList.add("nav-open");
-    }
+    if(v==="full") btn.classList.add("nav-full");
+    else if(v==="done") btn.classList.add("nav-done");
+    else btn.classList.add("nav-open");
   });
 }
 
-/* ↑ 回到最上（固定淺灰） */
+/* ↑ 回到最上 */
 const topBtn=document.createElement("button");
 topBtn.textContent="↑";
 topBtn.classList.add("nav-top");
@@ -193,13 +192,16 @@ function generateTimeOptions(){
 for(let t=1;t<=9;t++){
   const wrap=document.createElement("div");
   wrap.id="group-"+t;
+
   wrap.innerHTML=`
   <table>
-    <tr><td colspan="4">
-      <button class="lock-btn">🔓 解鎖中</button>
-      &nbsp;&nbsp;
-      <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
-    </td></tr>
+    <tr>
+      <td colspan="4">
+        <button class="lock-btn">🔓 解鎖中</button>
+        &nbsp;&nbsp;
+        <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
+      </td>
+    </tr>
 
     <tr>
       <td class="title">報團時間</td>
@@ -252,8 +254,12 @@ for(let t=1;t<=9;t++){
       <td><input></td>
       <td>
         <select class="dropdown role-select">
-          <option></option><option>坦</option><option>全奶</option>
-          <option>輸出</option><option>奶坦</option><option>輸出奶</option>
+          <option></option>
+          <option>坦</option>
+          <option>全奶</option>
+          <option>輸出</option>
+          <option>奶坦</option>
+          <option>輸出奶</option>
         </select>
       </td>
       <td><input type="checkbox"></td>
@@ -261,6 +267,132 @@ for(let t=1;t<=9;t++){
     </tr>`).join("")}
   </table>`;
   grid.appendChild(wrap);
+  initTable(wrap,t);
+}
+
+/* ===== initTable（完整） ===== */
+function initTable(root,idx){
+  const base=db.ref("test/groups/"+idx);
+  const lockRef=base.child("meta/locked");
+  const statusRef=base.child("header/status");
+
+  const dateInput=root.querySelector(".date-input");
+  const weekdayCell=root.querySelector(".weekday-cell");
+  const timeSelect=root.querySelector(".time-select");
+  const instance=root.querySelector(".instance-select");
+  const level=root.querySelector(".level-select");
+  const leader=root.querySelector(".leader-input");
+  const status=root.querySelector(".status-select");
+  const resetBtn=root.querySelector(".reset-btn");
+  const lockBtn=root.querySelector(".lock-btn");
+  const rows=[...root.querySelectorAll(".role-row")];
+  const inputs=[...root.querySelectorAll("input,select")];
+
+  function updateWeekday(){
+    if(!dateInput.value){weekdayCell.textContent="";return;}
+    const d=new Date(dateInput.value);
+    weekdayCell.textContent="星期"+weekdays[d.getDay()];
+  }
+
+  function applyRules(){
+    instance.className="dropdown instance-"+(instance.value||"empty");
+    status.className="dropdown status-"+status.value;
+
+    rows.forEach((r,i)=>{
+      r.classList.remove("trial-locked","role-full","role-done");
+      r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
+
+      if(instance.value==="trial" && i>=5){
+        r.classList.add("trial-locked");
+        r.querySelectorAll("input,select").forEach(el=>{
+          el.type==="checkbox"?el.checked=false:el.value="";
+          el.disabled=true;
+        });
+      }
+
+      if(status.value!=="open"){
+        r.classList.add(status.value==="full"?"role-full":"role-done");
+        r.querySelectorAll("td:nth-child(-n+3) input,select")
+          .forEach(el=>el.disabled=true);
+      }
+
+      const sel=r.querySelector(".role-select");
+      sel.parentElement.className={
+        "坦":"role-cell-tank",
+        "全奶":"role-cell-heal",
+        "輸出":"role-cell-dps",
+        "奶坦":"role-cell-ht",
+        "輸出奶":"role-cell-dh"
+      }[sel.value]||"role-cell-empty";
+    });
+  }
+
+  /* Firebase：表頭 */
+  [
+    [dateInput,"date"],
+    [timeSelect,"time"],
+    [instance,"instance"],
+    [level,"level"],
+    [leader,"leader"]
+  ].forEach(([el,k])=>{
+    const ref=base.child("header/"+k);
+    el.onchange=()=>ref.set(el.value);
+    ref.on("value",s=>{
+      el.value=s.val()||"";
+      updateWeekday();
+      applyRules();
+    });
+  });
+
+  /* 狀態 */
+  statusRef.once("value").then(s=>{
+    if(s.val()===null) statusRef.set("open");
+  });
+  status.onchange=()=>statusRef.set(status.value);
+  statusRef.on("value",s=>{
+    status.value=s.val()||"open";
+    updateWeekday();
+    applyRules();
+  });
+
+  /* Firebase：角色 */
+  rows.forEach((r,i)=>{
+    r.querySelectorAll("input,select").forEach(el=>{
+      const key=
+        el.type==="checkbox" ? "dc" :
+        el.classList.contains("role-select") ? "role" :
+        el===r.children[0].querySelector("input") ? "name" :
+        "note";
+      const ref=base.child("roles/"+i+"/"+key);
+      el.onchange=()=>ref.set(el.type==="checkbox"?el.checked:el.value);
+      ref.on("value",s=>{
+        el.type==="checkbox"?el.checked=!!s.val():el.value=s.val()||"";
+        applyRules();
+      });
+    });
+  });
+
+  /* 鎖定 */
+  lockBtn.onclick=()=>{
+    const wantLock=lockBtn.textContent.includes("解鎖");
+    lockRef.set(wantLock);
+  };
+  lockRef.on("value",s=>{
+    const locked=!!s.val();
+    lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
+    inputs.forEach(el=>el.disabled=locked);
+    resetBtn.disabled=locked;
+  });
+
+  /* 清除 */
+  resetBtn.onclick=()=>{
+    if(resetBtn.disabled) return;
+    if(!confirm("確定要清除目前團隊內容嗎？"))return;
+    base.set({});
+  };
+
+  updateWeekday();
+  applyRules();
 }
 </script>
 
