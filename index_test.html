@@ -2,28 +2,87 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.12-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.15-test</title>
 
 <style>
-body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
-body::before{content:"TEST MODE";position:fixed;top:10px;right:10px;background:#c00;color:#fff;padding:6px 12px;font-weight:bold;z-index:9999;border-radius:6px}
+body{
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:#f5f5f5;
+  padding:30px
+}
+body::before{
+  content:"TEST MODE";
+  position:fixed;
+  top:10px;
+  right:10px;
+  background:#c00;
+  color:#fff;
+  padding:6px 12px;
+  font-weight:bold;
+  z-index:9999;
+  border-radius:6px
+}
+
+/* 縮放 */
 .scale-wrapper{transform:scale(0.7);transform-origin:top left}
+
+/* 直排 */
 .grid{display:flex;flex-direction:column;gap:32px}
 
-/* 懸浮 */
-.floating-nav{position:fixed;right:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:9999}
-.floating-nav button{width:44px;height:44px;border-radius:50%;border:none;background:#555;color:#fff;font-size:18px;cursor:pointer}
-.floating-nav button:hover{background:#000}
-.back-top{position:fixed;right:24px;bottom:24px;width:52px;height:52px;border-radius:50%;background:#000;color:#fff;border:none;font-size:22px;cursor:pointer;z-index:9999}
+/* ===== 懸浮按鈕 ===== */
+.floating-nav{
+  position:fixed;
+  right:24px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  z-index:9999
+}
+.floating-nav button{
+  width:62px;
+  height:62px;
+  border-radius:50%;
+  border:none;
+  color:#fff;
+  font-size:25px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:background .15s
+}
+.floating-nav button:hover{filter:brightness(.9)}
+
+/* 狀態色（團用） */
+.nav-open{background:#1e8f4a}
+.nav-full{background:#f6c1c1;color:#000}
+.nav-done{background:#000}
+
+/* ↑ 固定色 */
+.nav-top{
+  background:#bdbdbd;
+  color:#000
+}
 
 /* 表格 */
 table{border-collapse:collapse;background:#fff;table-layout:fixed}
 td,th{border:2px solid #000;padding:10px;text-align:center;font-size:22px}
+table tr td:nth-child(3),table tr th:nth-child(3){width:200px}
+table tr td:nth-child(3) input{max-width:180px}
+
 input,select{border:none;background:transparent;font-size:22px;text-align:center}
 input[type="checkbox"]{transform:scale(1.4)}
-.reset-btn{padding:10px 24px;border-radius:999px;border:none;background:#444;color:#fff;cursor:pointer;font-size:22px}
+
+.reset-btn{
+  padding:10px 24px;border-radius:999px;border:none;
+  background:#444;color:#fff;cursor:pointer;font-size:22px
+}
 .reset-btn:disabled{opacity:.4;cursor:not-allowed}
-.lock-btn{padding:10px 24px;border-radius:999px;border:none;background:#000;color:#fff;cursor:pointer;font-size:22px}
+
+.lock-btn{
+  padding:10px 24px;border-radius:999px;border:none;
+  background:#000;color:#fff;cursor:pointer;font-size:22px
+}
 
 .title{background:#fff200;font-weight:bold}
 .header{background:#ffe8b0;font-weight:bold}
@@ -46,6 +105,7 @@ input[type="checkbox"]{transform:scale(1.4)}
 .role-full td{background:#f6c1c1}
 .role-done td{background:#4a4a4a;color:#fff}
 .trial-locked td{background:#000!important;color:#fff!important}
+
 .role-cell-tank{background:#f6c1c1}
 .role-cell-heal{background:#cdeecb}
 .role-cell-dps{background:#cfe8ff}
@@ -58,7 +118,6 @@ input[type="checkbox"]{transform:scale(1.4)}
 <body>
 
 <div class="floating-nav" id="floatingNav"></div>
-<button class="back-top" onclick="scrollToGroup(1)">↑</button>
 
 <div class="scale-wrapper">
   <div class="grid" id="grid"></div>
@@ -82,30 +141,59 @@ const weekdays=["日","一","二","三","四","五","六"];
 const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
 const grid=document.getElementById("grid");
 
-/* 懸浮 */
-function scrollToGroup(n){document.getElementById("group-"+n)?.scrollIntoView({behavior:"smooth"})}
+/* ===== 懸浮導覽 ===== */
+function scrollToGroup(n){
+  document.getElementById("group-"+n)?.scrollIntoView({behavior:"smooth"});
+}
+function scrollToTop(){
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
 const floatingNav=document.getElementById("floatingNav");
+
+/* 1~9 團 */
 for(let i=1;i<=9;i++){
-  const b=document.createElement("button");
-  b.textContent=i;b.onclick=()=>scrollToGroup(i);
-  floatingNav.appendChild(b);
+  const btn=document.createElement("button");
+  btn.textContent=i;
+  btn.classList.add("nav-open");
+  btn.onclick=()=>scrollToGroup(i);
+  floatingNav.appendChild(btn);
+
+  db.ref("test/groups/"+i+"/header/status").on("value",s=>{
+    const v=s.val()||"open";
+    btn.classList.remove("nav-open","nav-full","nav-done");
+    if(v==="full"){
+      btn.classList.add("nav-full");
+    }else if(v==="done"){
+      btn.classList.add("nav-done");
+    }else{
+      btn.classList.add("nav-open");
+    }
+  });
 }
 
-/* 時間 */
+/* ↑ 回到最上（固定淺灰） */
+const topBtn=document.createElement("button");
+topBtn.textContent="↑";
+topBtn.classList.add("nav-top");
+topBtn.onclick=scrollToTop;
+floatingNav.appendChild(topBtn);
+
+/* ===== 時間選項 ===== */
 function generateTimeOptions(){
-  let h='<option></option>';
-  for(let i=0;i<24;i++){
-    const hh=String(i).padStart(2,"0");
-    h+=`<option>${hh}:00</option><option>${hh}:30</option>`;
+  let html='<option></option>';
+  for(let h=0;h<24;h++){
+    const hh=String(h).padStart(2,"0");
+    html+=`<option>${hh}:00</option><option>${hh}:30</option>`;
   }
-  return h;
+  return html;
 }
 
-/* 建立 */
+/* ===== 建立 9 團 ===== */
 for(let t=1;t<=9;t++){
-  const w=document.createElement("div");
-  w.id="group-"+t;
-  w.innerHTML=`
+  const wrap=document.createElement("div");
+  wrap.id="group-"+t;
+  wrap.innerHTML=`
   <table>
     <tr><td colspan="4">
       <button class="lock-btn">🔓 解鎖中</button>
@@ -164,130 +252,15 @@ for(let t=1;t<=9;t++){
       <td><input></td>
       <td>
         <select class="dropdown role-select">
-          <option></option>
-          <option>坦</option>
-          <option>全奶</option>
-          <option>輸出</option>
-          <option>奶坦</option>
-          <option>輸出奶</option>
+          <option></option><option>坦</option><option>全奶</option>
+          <option>輸出</option><option>奶坦</option><option>輸出奶</option>
         </select>
       </td>
       <td><input type="checkbox"></td>
       <td><input></td>
     </tr>`).join("")}
   </table>`;
-  grid.appendChild(w);
-  initTable(w,t);
-}
-
-function initTable(root,idx){
-  const base=db.ref("test/groups/"+idx);
-  const lockRef=base.child("meta/locked");
-  const statusRef=base.child("header/status");
-
-  const dateInput=root.querySelector(".date-input");
-  const weekdayCell=root.querySelector(".weekday-cell");
-  const instance=root.querySelector(".instance-select");
-  const level=root.querySelector(".level-select");
-  const leader=root.querySelector(".leader-input");
-  const status=root.querySelector(".status-select");
-  const resetBtn=root.querySelector(".reset-btn");
-  const lockBtn=root.querySelector(".lock-btn");
-  const rows=[...root.querySelectorAll(".role-row")];
-  const inputs=[...root.querySelectorAll("input,select")];
-
-  function updateWeekday(){
-    if(!dateInput.value){weekdayCell.textContent="";return;}
-    const d=new Date(dateInput.value);
-    weekdayCell.textContent="星期"+weekdays[d.getDay()];
-  }
-
-  function applyRules(){
-    instance.className="dropdown instance-"+(instance.value||"empty");
-    status.className="dropdown status-"+status.value;
-
-    rows.forEach((r,i)=>{
-      r.classList.remove("trial-locked","role-full","role-done");
-      r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
-
-      if(instance.value==="trial" && i>=5){
-        r.classList.add("trial-locked");
-        r.querySelectorAll("input,select").forEach(el=>{
-          el.type==="checkbox"?el.checked=false:el.value="";
-          el.disabled=true;
-        });
-      }
-      if(status.value!=="open"){
-        r.classList.add(status.value==="full"?"role-full":"role-done");
-        r.querySelectorAll("td:nth-child(-n+3) input,select").forEach(el=>el.disabled=true);
-      }
-
-      const sel=r.querySelector(".role-select");
-      sel.parentElement.className={
-        "坦":"role-cell-tank",
-        "全奶":"role-cell-heal",
-        "輸出":"role-cell-dps",
-        "奶坦":"role-cell-ht",
-        "輸出奶":"role-cell-dh"
-      }[sel.value]||"role-cell-empty";
-    });
-  }
-
-  /* === 表頭同步（含狀態預設） === */
-  [
-    [dateInput,"date"],
-    [root.querySelector(".time-select"),"time"],
-    [instance,"instance"],
-    [level,"level"],
-    [leader,"leader"]
-  ].forEach(([el,k])=>{
-    const ref=base.child("header/"+k);
-    el.onchange=()=>ref.set(el.value);
-    ref.on("value",s=>{el.value=s.val()||"";updateWeekday();applyRules()});
-  });
-
-  // 狀態：補預設 open
-  statusRef.once("value").then(s=>{
-    if(s.val()===null) statusRef.set("open");
-  });
-  status.onchange=()=>statusRef.set(status.value);
-  statusRef.on("value",s=>{
-    const v=s.val()||"open";
-    status.value=v;
-    updateWeekday();applyRules();
-  });
-
-  /* 角色同步 */
-  rows.forEach((r,i)=>{
-    r.querySelectorAll("input,select").forEach(el=>{
-      const key=el.type==="checkbox"?"dc":el.classList.contains("role-select")?"role":el===r.children[0].querySelector("input")?"name":"note";
-      const ref=base.child("roles/"+i+"/"+key);
-      el.onchange=()=>ref.set(el.type==="checkbox"?el.checked:el.value);
-      ref.on("value",s=>{
-        el.type==="checkbox"?el.checked=!!s.val():el.value=s.val()||"";
-        applyRules();
-      });
-    });
-  });
-
-  /* 鎖定 */
-  lockBtn.onclick=()=>lockRef.set(lockBtn.textContent.includes("解鎖"));
-  lockRef.on("value",s=>{
-    const locked=!!s.val();
-    lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
-    inputs.forEach(el=>el.disabled=locked);
-    resetBtn.disabled=locked;
-  });
-
-  /* 清除 */
-  resetBtn.onclick=()=>{
-    if(resetBtn.disabled) return;
-    if(!confirm("確定要清除目前團隊內容嗎？"))return;
-    base.set({});
-  };
-
-  updateWeekday();
-  applyRules();
+  grid.appendChild(wrap);
 }
 </script>
 
