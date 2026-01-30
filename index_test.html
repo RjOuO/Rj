@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.13-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.12-test</title>
 
 <style>
 body{
@@ -194,8 +194,7 @@ const grid=document.getElementById("grid");
 
 /* 捲動 */
 function scrollToGroup(n){
-  document.getElementById("group-"+n)
-    ?.scrollIntoView({behavior:"smooth"});
+  document.getElementById("group-"+n)?.scrollIntoView({behavior:"smooth"});
 }
 
 /* 懸浮導覽 */
@@ -299,9 +298,9 @@ for(let t=1;t<=9;t++){
   initTable(wrap,t);
 }
 
-/* 初始化每團（含 Firebase 鎖定同步） */
+/* 初始化每團（鎖定同步修正版） */
 function initTable(root,idx){
-  const ref=db.ref("test/groups/"+idx+"/meta/locked");
+  const lockRef=db.ref("test/groups/"+idx+"/meta/locked");
 
   const dateInput=root.querySelector(".date-input");
   const weekdayCell=root.querySelector(".weekday-cell");
@@ -368,15 +367,14 @@ function initTable(root,idx){
     applyRules();
   };
 
-  /* 點擊鎖定 → 寫 Firebase */
+  /* 點擊鎖定：直接寫入目標狀態 */
   lockBtn.onclick=()=>{
-    ref.get().then(s=>{
-      ref.set(!s.val());
-    });
+    const wantLock = lockBtn.textContent.includes("解鎖");
+    lockRef.set(wantLock);
   };
 
-  /* 監聽鎖定狀態（多人同步） */
-  ref.on("value",s=>{
+  /* 唯一鎖定狀態來源（多人同步） */
+  lockRef.on("value",s=>{
     const locked=!!s.val();
     lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
     inputs.forEach(el=>el.disabled=locked);
