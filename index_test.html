@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.15-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.17-test</title>
 
 <style>
 body{
@@ -23,23 +23,56 @@ body::before{
   border-radius:6px
 }
 
+/* ===== 外層容器 ===== */
+.container{
+  display:flex;
+  align-items:flex-start;
+}
+
 /* 縮放 */
-.scale-wrapper{transform:scale(0.7);transform-origin:top left}
+.scale-wrapper{
+  transform:scale(0.7);
+  transform-origin:top left;
+}
 
-/* 直排 */
-.grid{display:flex;flex-direction:column;gap:32px}
+/* 表格直排 */
+.grid{
+  display:flex;
+  flex-direction:column;
+  gap:32px;
+}
 
-/* ===== 懸浮按鈕 ===== */
+/* ===== 懸浮按鈕欄 ===== */
 .floating-nav{
-  position:fixed;
-  right:24px;
+  position:sticky;
   top:50%;
   transform:translateY(-50%);
+  margin-left:-250px;
   display:flex;
   flex-direction:column;
   gap:14px;
-  z-index:9999
+  z-index:50;
 }
+
+/* 單顆按鈕容器（固定寬高，避免位移） */
+.nav-item{
+  position:relative;
+  width:62px;
+  height:62px;
+}
+
+/* 鎖頭：浮貼在左側，不佔版面 */
+.nav-lock{
+  position:absolute;
+  left:-24px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:22px;
+  display:none;
+  pointer-events:none;
+}
+
+/* 按鈕 */
 .floating-nav button{
   width:62px;
   height:62px;
@@ -53,21 +86,10 @@ body::before{
 }
 .floating-nav button:hover{background:#000}
 
-/* =====【關鍵修正：狀態色最終覆蓋】===== */
-.floating-nav button.nav-open{
-  background:#1e8f4a !important
-}
-.floating-nav button.nav-full{
-  background:#f6c1c1 !important;
-  color:#000 !important
-}
-.floating-nav button.nav-done{
-  background:#000 !important
-}
-.floating-nav button.nav-top{
-  background:#bdbdbd !important;
-  color:#000 !important
-}
+.floating-nav button.nav-open{background:#1e8f4a}
+.floating-nav button.nav-full{background:#f6c1c1;color:#000}
+.floating-nav button.nav-done{background:#000}
+.floating-nav button.nav-top{background:#bdbdbd;color:#000}
 
 /* ===== 表格樣式（原封不動） ===== */
 table{border-collapse:collapse;background:#fff;table-layout:fixed}
@@ -121,10 +143,14 @@ input[type="checkbox"]{transform:scale(1.4)}
 
 <body>
 
-<div class="floating-nav" id="floatingNav"></div>
+<div class="container">
 
-<div class="scale-wrapper">
-  <div class="grid" id="grid"></div>
+  <div class="scale-wrapper">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="floating-nav" id="floatingNav"></div>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -144,8 +170,9 @@ const db=firebase.database();
 const weekdays=["日","一","二","三","四","五","六"];
 const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
 const grid=document.getElementById("grid");
+const floatingNav=document.getElementById("floatingNav");
 
-/* 捲動 */
+/* ===== 捲動 ===== */
 function scrollToGroup(n){
   document.getElementById("group-"+n)?.scrollIntoView({behavior:"smooth"});
 }
@@ -153,30 +180,46 @@ function scrollToTop(){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-/* ===== 懸浮按鈕 ===== */
-const floatingNav=document.getElementById("floatingNav");
-
+/* ===== 懸浮按鈕（鎖頭浮貼，不位移） ===== */
 for(let i=1;i<=9;i++){
+  const item=document.createElement("div");
+  item.className="nav-item";
+
+  const lock=document.createElement("span");
+  lock.className="nav-lock";
+  lock.textContent="🔒";
+
   const btn=document.createElement("button");
   btn.textContent=i;
   btn.onclick=()=>scrollToGroup(i);
-  floatingNav.appendChild(btn);
+
+  item.appendChild(lock);
+  item.appendChild(btn);
+  floatingNav.appendChild(item);
 
   db.ref("test/groups/"+i+"/header/status").on("value",s=>{
     const v=s.val()||"open";
-    btn.classList.remove("nav-open","nav-full","nav-done");
-    if(v==="full") btn.classList.add("nav-full");
-    else if(v==="done") btn.classList.add("nav-done");
-    else btn.classList.add("nav-open");
+    btn.className="";
+    btn.classList.add(
+      v==="full"?"nav-full":
+      v==="done"?"nav-done":"nav-open"
+    );
+  });
+
+  db.ref("test/groups/"+i+"/meta/locked").on("value",s=>{
+    lock.style.display=s.val() ? "block" : "none";
   });
 }
 
-/* ↑ 回到最上 */
+/* 回到最上 */
+const topItem=document.createElement("div");
+topItem.className="nav-item";
 const topBtn=document.createElement("button");
 topBtn.textContent="↑";
 topBtn.classList.add("nav-top");
 topBtn.onclick=scrollToTop;
-floatingNav.appendChild(topBtn);
+topItem.appendChild(topBtn);
+floatingNav.appendChild(topItem);
 
 /* ===== 時間選項 ===== */
 function generateTimeOptions(){
@@ -265,7 +308,8 @@ for(let t=1;t<=9;t++){
       <td><input type="checkbox"></td>
       <td><input></td>
     </tr>`).join("")}
-  </table>`;
+  </table>
+  `;
   grid.appendChild(wrap);
   initTable(wrap,t);
 }
@@ -327,7 +371,6 @@ function initTable(root,idx){
     });
   }
 
-  /* Firebase：表頭 */
   [
     [dateInput,"date"],
     [timeSelect,"time"],
@@ -344,7 +387,6 @@ function initTable(root,idx){
     });
   });
 
-  /* 狀態 */
   statusRef.once("value").then(s=>{
     if(s.val()===null) statusRef.set("open");
   });
@@ -355,7 +397,6 @@ function initTable(root,idx){
     applyRules();
   });
 
-  /* Firebase：角色 */
   rows.forEach((r,i)=>{
     r.querySelectorAll("input,select").forEach(el=>{
       const key=
@@ -372,7 +413,6 @@ function initTable(root,idx){
     });
   });
 
-  /* 鎖定 */
   lockBtn.onclick=()=>{
     const wantLock=lockBtn.textContent.includes("解鎖");
     lockRef.set(wantLock);
@@ -384,7 +424,6 @@ function initTable(root,idx){
     resetBtn.disabled=locked;
   });
 
-  /* 清除 */
   resetBtn.onclick=()=>{
     if(resetBtn.disabled) return;
     if(!confirm("確定要清除目前團隊內容嗎？"))return;
