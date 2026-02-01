@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.27-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.29-test</title>
 
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
@@ -180,9 +180,12 @@ function initTable(root,idx){
     const MAX = (instance.value==="trial") ? 5 : 10;
     root.dataset.max = String(MAX);
 
+    const isLocked = root.dataset.locked==="1";
     rows.forEach((r,i)=>{
       r.classList.remove("trial-locked","role-full","role-done");
-      r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
+      if(!isLocked){
+        r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
+      }
       if(instance.value==="trial" && i>=5){
         r.classList.add("trial-locked");
         r.querySelectorAll("input,select").forEach(el=>el.disabled=true);
@@ -220,8 +223,8 @@ function initTable(root,idx){
   lockBtn.onclick=()=>{const wantLock=lockBtn.textContent.includes("解鎖"); lockRef.set(wantLock)};
   lockRef.on("value",s=>{
     const locked=!!s.val();
+    root.dataset.locked = locked ? "1" : "0";
     lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
-    // 統一鎖定：包含角色列所有 input / select
     root.querySelectorAll("input,select").forEach(el=>{
       el.disabled = locked;
     });
