@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.26-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.27-test</title>
 
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
@@ -221,8 +221,11 @@ function initTable(root,idx){
   lockRef.on("value",s=>{
     const locked=!!s.val();
     lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
-    inputs.forEach(el=>el.disabled=locked);
-    resetBtn.disabled=locked;
+    // 統一鎖定：包含角色列所有 input / select
+    root.querySelectorAll("input,select").forEach(el=>{
+      el.disabled = locked;
+    });
+    resetBtn.disabled = locked;
   });
 
   resetBtn.onclick=()=>{if(resetBtn.disabled) return; if(!confirm("確定要清除目前團隊內容嗎？")) return; base.set({})};
