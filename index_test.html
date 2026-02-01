@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.21-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.26-test</title>
 
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
@@ -56,6 +56,15 @@ input[type="checkbox"]{transform:scale(1.4)}
 .role-cell-ht{background:#e3d4f3}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
+
+.trial-locked td,
+.trial-locked td input,
+.trial-locked td select{
+  background:#000!important;
+  color:#000!important;
+  -webkit-text-fill-color:#000!important;
+}
+
 </style>
 </head>
 
@@ -112,27 +121,31 @@ for(let t=1;t<=9;t++){
       <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
       <span class="reset-missing" id="reset-missing-${t}"></span>
     </td></tr>
-    <tr><td class="title">報團時間</td><td><input type="date" class="date-input"></td>
-        <td class="gray-cell weekday-cell"></td>
-        <td><select class="dropdown time-select">${generateTimeOptions()}</select></td></tr>
+    <tr><td class="title">報團時間</td><td><input type="date" class="date-input"></td><td class="gray-cell weekday-cell"></td><td><select class="dropdown time-select">${generateTimeOptions()}</select></td></tr>
     <tr><td class="header">選擇副本</td><td class="header">等級</td><td class="header">隊長ID</td><td class="header">狀態</td></tr>
-    <tr><td><select class="dropdown instance-select">
-          <option value=""></option>
-          <option value="normal">一般10人俠境</option>
-          <option value="trial">試劍</option>
-          <option value="guild">百業10人俠境</option>
-          <option value="mix">百業+一般俠境</option>
-        </select></td>
-        <td><select class="dropdown level-select"><option></option><option>56</option><option>61</option><option>66</option><option>71</option></select></td>
-        <td><input class="leader-input"></td>
-        <td><select class="dropdown status-select"><option value="open">未滿</option><option value="full">滿團</option><option value="done">完成</option></select></td></tr>
+    <tr>
+      <td><select class="dropdown instance-select">
+        <option value=""></option>
+        <option value="normal">一般10人俠境</option>
+        <option value="trial">試劍</option>
+        <option value="guild">百業10人俠境</option>
+        <option value="mix">百業+一般俠境</option>
+      </select></td>
+      <td><select class="dropdown level-select"><option></option><option>56</option><option>61</option><option>66</option><option>71</option></select></td>
+      <td><input class="leader-input"></td>
+      <td><select class="dropdown status-select"><option value="open">未滿</option><option value="full">滿團</option><option value="done">完成</option></select></td>
+    </tr>
     <tr><td class="header">角色ID</td><td class="header">定位</td><td class="header">DC語音</td><td class="header">備註</td></tr>
     ${Array.from({length:10}).map(()=>`
-    <tr class="role-row"><td><input></td><td>
-      <select class="dropdown role-select"><option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select>
-    </td><td><input type="checkbox"></td><td><input></td></tr>`).join("")}
+      <tr class="role-row">
+        <td><input></td>
+        <td><select class="dropdown role-select"><option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td>
+        <td><input type="checkbox"></td>
+        <td><input></td>
+      </tr>`).join("")}
   </table>`;
-  grid.appendChild(wrap); initTable(wrap,t);
+  grid.appendChild(wrap);
+  initTable(wrap,t);
 }
 
 function initTable(root,idx){
@@ -151,6 +164,9 @@ function initTable(root,idx){
   const rows=[...root.querySelectorAll(".role-row")];
   const inputs=[...root.querySelectorAll("input,select")];
 
+  // default MAX
+  root.dataset.max = "10";
+
   function updateWeekday(){
     if(!dateInput.value){weekdayCell.textContent="";return;}
     const d=new Date(dateInput.value); weekdayCell.textContent="星期"+weekdays[d.getDay()];
@@ -159,12 +175,17 @@ function initTable(root,idx){
   function applyRules(){
     instance.className="dropdown instance-"+(instance.value||"empty");
     status.className="dropdown status-"+status.value;
+
+    // ★ Persist MAX on container (single source of truth)
+    const MAX = (instance.value==="trial") ? 5 : 10;
+    root.dataset.max = String(MAX);
+
     rows.forEach((r,i)=>{
       r.classList.remove("trial-locked","role-full","role-done");
       r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
       if(instance.value==="trial" && i>=5){
         r.classList.add("trial-locked");
-        r.querySelectorAll("input,select").forEach(el=>{el.type==="checkbox"?el.checked=false:el.value="";el.disabled=true});
+        r.querySelectorAll("input,select").forEach(el=>el.disabled=true);
       }
       if(status.value!=="open"){
         r.classList.add(status.value==="full"?"role-full":"role-done");
@@ -173,6 +194,8 @@ function initTable(root,idx){
       const sel=r.querySelector(".role-select");
       sel.parentElement.className={"坦":"role-cell-tank","全奶":"role-cell-heal","輸出":"role-cell-dps","奶坦":"role-cell-ht","輸出奶":"role-cell-dh"}[sel.value]||"role-cell-empty";
     });
+
+    window.__recalcMissing && window.__recalcMissing();
   }
 
   [[dateInput,"date"],[timeSelect,"time"],[instance,"instance"],[level,"level"],[leader,"leader"]].forEach(([el,k])=>{
@@ -195,46 +218,51 @@ function initTable(root,idx){
   });
 
   lockBtn.onclick=()=>{const wantLock=lockBtn.textContent.includes("解鎖"); lockRef.set(wantLock)};
-  lockRef.on("value",s=>{const locked=!!s.val(); lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中"; inputs.forEach(el=>el.disabled=locked); resetBtn.disabled=locked});
-  resetBtn.onclick=()=>{if(resetBtn.disabled) return; if(!confirm("確定要清除目前團隊內容嗎？"))return; base.set({})};
+  lockRef.on("value",s=>{
+    const locked=!!s.val();
+    lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
+    inputs.forEach(el=>el.disabled=locked);
+    resetBtn.disabled=locked;
+  });
+
+  resetBtn.onclick=()=>{if(resetBtn.disabled) return; if(!confirm("確定要清除目前團隊內容嗎？")) return; base.set({})};
   updateWeekday(); applyRules();
 }
 </script>
 
-<!-- FIXED: determine MAX via instance-select class (instance-trial) -->
 <script>
 window.addEventListener("load",()=>{
-  function update(){
+  function recalc(){
     for(let i=1;i<=9;i++){
       const g=document.getElementById("group-"+i);
       if(!g) continue;
-      const instanceSel=g.querySelector(".instance-select");
-      const isTrial = instanceSel && instanceSel.classList.contains("instance-trial");
-      const MAX = isTrial ? 5 : 10;
 
+      const MAX = parseInt(g.dataset.max || "10", 10);
       const nav=document.getElementById("nav-missing-"+i);
       const reset=document.getElementById("reset-missing-"+i);
 
       let c=0;
-      g.querySelectorAll("tr.role-row td:first-child input").forEach(inp=>{
-        if(inp.value.trim()!=="") c++;
+      const inputs = g.querySelectorAll("tr.role-row td:first-child input");
+      inputs.forEach((inp,idx)=>{
+        if(idx < MAX && inp.value.trim()!=="") c++;
       });
 
-      const miss=MAX-c;
-      const cls=(miss<=2?"alert":"normal");
+      const miss = MAX - c;
+      const cls = (miss<=2?"alert":"normal");
 
       if(nav){
-        if(miss<=0){ nav.textContent=""; nav.className="nav-missing"; }
-        else{ nav.textContent="(-"+miss+")"; nav.className="nav-missing "+cls; }
+        if(miss<=0){nav.textContent=""; nav.className="nav-missing";}
+        else{nav.textContent="(-"+miss+")"; nav.className="nav-missing "+cls;}
       }
       if(reset){
-        if(miss<=0){ reset.textContent=""; reset.className="reset-missing"; }
-        else{ reset.textContent="目前還缺 "+miss+" 人"; reset.className="reset-missing "+cls; }
+        if(miss<=0){reset.textContent=""; reset.className="reset-missing";}
+        else{reset.textContent="目前還缺 "+miss+" 人"; reset.className="reset-missing "+cls;}
       }
     }
   }
-  update();
-  setInterval(update,800);
+  window.__recalcMissing = recalc;
+  recalc();
+  setInterval(recalc,800);
 });
 </script>
 
