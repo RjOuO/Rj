@@ -2,7 +2,8 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.4.43</title>
+<title>遊戲旅舍報團專用表（九團版） v1.4.27</title>
+
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
 .container{display:flex;align-items:flex-start}
@@ -54,21 +55,17 @@ input[type="checkbox"]{transform:scale(1.4)}
 .role-cell-ht{background:#e3d4f3}
 .role-cell-dh{background:#e6e6e6}
 .role-cell-empty{background:#fff}
-.countdown-slot{
-  position:absolute;
-  right:20px;
-  top:50%;
-  transform:translateY(-50%);
-  width:260px;
-  text-align:right;
-  font-size:35px;
-  font-weight:bold;
-  white-space:nowrap;
-  pointer-events:none;
+
+.trial-locked td,
+.trial-locked td input,
+.trial-locked td select{
+  background:#000!important;
+  color:#000!important;
+  -webkit-text-fill-color:#000!important;
 }
-.countdown-slot.alert{color:#d40000;animation:blink 1s infinite}
 </style>
 </head>
+
 <body>
 <div class="container">
   <div class="scale-wrapper"><div class="grid" id="grid"></div></div>
@@ -113,15 +110,16 @@ const topBtn=document.createElement("button"); topBtn.textContent="↑"; topBtn.
 topBtn.onclick=scrollToTop; topItem.appendChild(topBtn); floatingNav.appendChild(topItem);
 
 function generateTimeOptions(){let html='<option></option>';for(let h=0;h<24;h++){const hh=String(h).padStart(2,"0");html+=`<option>${hh}:00</option><option>${hh}:30</option>`}return html}
+</script>
 
+<script>
 for(let t=1;t<=9;t++){
   const wrap=document.createElement("div"); wrap.id="group-"+t;
   wrap.innerHTML=`<table>
     <tr><td colspan="4">
-      <button class="lock-btn">🔓 解鎖中</button>
+      <button class="lock-btn">🔓 解鎖中</button>&nbsp;&nbsp;
       <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
       <span class="reset-missing" id="reset-missing-${t}"></span>
-      <span class="countdown-slot" id="countdown-${t}"></span>
     </td></tr>
     <tr><td class="title">報團時間</td><td><input type="date" class="date-input"></td><td class="gray-cell weekday-cell"></td><td><select class="dropdown time-select">${generateTimeOptions()}</select></td></tr>
     <tr><td class="header">選擇副本</td><td class="header">等級</td><td class="header">隊長ID</td><td class="header">狀態</td></tr>
@@ -175,12 +173,16 @@ function initTable(root,idx){
   function applyRules(){
     instance.className="dropdown instance-"+(instance.value||"empty");
     status.className="dropdown status-"+status.value;
-    const MAX=(instance.value==="trial")?5:10; root.dataset.max=String(MAX);
-    const isLocked=root.dataset.locked==="1";
+    const MAX=(instance.value==="trial")?5:10;
+    root.dataset.max=String(MAX);
+
     rows.forEach((r,i)=>{
       r.classList.remove("trial-locked","role-full","role-done");
-      if(!isLocked){r.querySelectorAll("input,select").forEach(el=>el.disabled=false);}
-      if(instance.value==="trial"&&i>=5){r.classList.add("trial-locked"); r.querySelectorAll("input,select").forEach(el=>el.disabled=true);}
+      r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
+      if(instance.value==="trial"&&i>=5){
+        r.classList.add("trial-locked");
+        r.querySelectorAll("input,select").forEach(el=>el.disabled=true);
+      }
       if(status.value!=="open"){
         r.classList.add(status.value==="full"?"role-full":"role-done");
         r.querySelectorAll("td:nth-child(-n+3) input,select").forEach(el=>el.disabled=true);
@@ -188,7 +190,8 @@ function initTable(root,idx){
       const sel=r.querySelector(".role-select");
       sel.parentElement.className={"坦":"role-cell-tank","全奶":"role-cell-heal","輸出":"role-cell-dps","奶坦":"role-cell-ht","輸出奶":"role-cell-dh"}[sel.value]||"role-cell-empty";
     });
-    window.__recalcMissing && window.__recalcMissing();
+
+    window.__recalcMissing&&window.__recalcMissing();
   }
 
   [[dateInput,"date"],[timeSelect,"time"],[instance,"instance"],[level,"level"],[leader,"leader"]].forEach(([el,k])=>{
@@ -213,79 +216,44 @@ function initTable(root,idx){
   lockBtn.onclick=()=>{const wantLock=lockBtn.textContent.includes("解鎖"); lockRef.set(wantLock)};
   lockRef.on("value",s=>{
     const locked=!!s.val();
-    root.dataset.locked=locked?"1":"0";
     lockBtn.textContent=locked?"🔒 已鎖定":"🔓 解鎖中";
-    root.querySelectorAll("input,select").forEach(el=>{el.disabled=locked});
+    root.querySelectorAll("input,select").forEach(el=>el.disabled=locked);
     resetBtn.disabled=locked;
   });
 
-  resetBtn.onclick=()=>{if(resetBtn.disabled) return; if(!confirm("確定要清除目前團隊內容嗎？")) return; base.set({})};
-  updateWeekday(); applyRules();
+  resetBtn.onclick=()=>{if(resetBtn.disabled)return;if(!confirm("確定要清除目前團隊內容嗎？"))return;base.set({})};
+  updateWeekday();applyRules();
 }
+</script>
 
+<script>
 window.addEventListener("load",()=>{
   function recalc(){
     for(let i=1;i<=9;i++){
-      const g=document.getElementById("group-"+i); if(!g) continue;
+      const g=document.getElementById("group-"+i); if(!g)continue;
       const MAX=parseInt(g.dataset.max||"10",10);
       const nav=document.getElementById("nav-missing-"+i);
       const reset=document.getElementById("reset-missing-"+i);
       let c=0;
-      const inputs=g.querySelectorAll("tr.role-row td:first-child input");
-      inputs.forEach((inp,idx)=>{if(idx<MAX&&inp.value.trim()!=="") c++});
+      g.querySelectorAll("tr.role-row td:first-child input").forEach((inp,idx)=>{
+        if(idx<MAX&&inp.value.trim()!=="")c++;
+      });
       const miss=MAX-c;
       const cls=(miss<=2?"alert":"normal");
-      if(nav){if(miss<=0){nav.textContent=""; nav.className="nav-missing"} else{nav.textContent="(-"+miss+")"; nav.className="nav-missing "+cls}}
-      if(reset){if(miss<=0){reset.textContent=""; reset.className="reset-missing"} else{reset.textContent="目前還缺 "+miss+" 人"; reset.className="reset-missing "+cls}}
+      if(nav){
+        if(miss<=0){nav.textContent="";nav.className="nav-missing";}
+        else{nav.textContent="(-"+miss+")";nav.className="nav-missing "+cls;}
+      }
+      if(reset){
+        if(miss<=0){reset.textContent="";reset.className="reset-missing";}
+        else{reset.textContent="目前還缺 "+miss+" 人";reset.className="reset-missing "+cls;}
+      }
     }
   }
-  window.__recalcMissing=recalc; recalc(); setInterval(recalc,800);
+  window.__recalcMissing=recalc;
+  recalc();
+  setInterval(recalc,800);
 });
-</script>
-
-<script>
-(function(){
-  const COUNTDOWN_SEC=60; const state={};
-  function getMax(groupEl){return parseInt(groupEl.dataset.max||"10",10)}
-  function countReady(groupEl){
-    const MAX=getMax(groupEl); let ready=0;
-    const rows=groupEl.querySelectorAll("tr.role-row");
-    rows.forEach((row,idx)=>{
-      if(idx>=MAX) return;
-      const id=row.querySelector("td:first-child input");
-      const role=row.querySelector(".role-select");
-      if(id&&role&&id.value.trim()!==""&&role.value.trim()!==""){ready++}
-    });
-    return ready;
-  }
-  function setStatusIfNeeded(ref, val){
-    ref.once("value").then(s=>{ if(s.val()!==val) ref.set(val) });
-  }
-  function tick(groupId){
-    const groupEl=document.getElementById("group-"+groupId); if(!groupEl) return;
-    const MAX=getMax(groupEl); const ready=countReady(groupEl);
-    const display=document.getElementById("countdown-"+groupId);
-    const statusRef=firebase.database().ref("groups/"+groupId+"/header/status");
-    if(ready<MAX){
-      state[groupId]=null;
-      if(display){display.textContent=""; display.className="countdown-slot"}
-      setStatusIfNeeded(statusRef,"open");
-      return;
-    }
-    if(!state[groupId]) state[groupId]={remain:COUNTDOWN_SEC};
-    if(display){
-      display.textContent="滿團倒數 "+state[groupId].remain+" 秒";
-      if(state[groupId].remain<=10) display.classList.add("alert"); else display.classList.remove("alert");
-    }
-    state[groupId].remain--;
-    if(state[groupId].remain<0){
-      state[groupId]=null;
-      if(display){display.textContent=""; display.className="countdown-slot"}
-      setStatusIfNeeded(statusRef,"full");
-    }
-  }
-  window.addEventListener("load",()=>{ for(let i=1;i<=9;i++){ state[i]=null; setInterval(()=>tick(i),1000)} });
-})();
 </script>
 
 </body>
