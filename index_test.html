@@ -837,7 +837,7 @@ window.addEventListener("load",()=>{
     if(u){
       $("auth-logged-out").style.display="none";
       $("auth-logged-in").style.display="block";
-      $("auth-user").textContent = "已登入："+(u.帳號||"Google");
+      $("auth-user").textContent = "已登入：" + (window.__userNickname || "已登入");
     }else{
       $("auth-logged-out").style.display="block";
       $("auth-logged-in").style.display="none";
@@ -876,7 +876,7 @@ window.addEventListener("load",()=>{
     if(u && !u.isAnonymous){
       out.style.display="none";
       inn.style.display="block";
-      $("auth-user").textContent = "已登入："+(u.帳號||"Google");
+      $("auth-user").textContent = "已登入：" + (window.__userNickname || "已登入");
     }else{
       inn.style.display="none";
       out.style.display="block";
@@ -915,7 +915,7 @@ window.addEventListener("load",()=>{
     if(u && !u.isAnonymous){
       $("auth-guest").style.display="none";
       $("auth-user-box").style.display="block";
-      $("auth-user-帳號").textContent="已登入："+(u.帳號||"Google");
+      $("auth-user-帳號").textContent = "已登入：" + (window.__userNickname || "已登入");
     }else{
       $("auth-user-box").style.display="none";
       $("auth-guest").style.display="block";
@@ -1296,7 +1296,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 <div id="nick-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;">
   <div style="background:#fff;width:320px;max-width:90%;margin:15% auto;padding:16px;border-radius:10px;">
     <div style="font-size:16px;font-weight:bold;margin-bottom:8px">設定暱稱與定位</div>
-    <input id="nick-input" placeholder="暱稱（7字內）" style="width:100%;margin-bottom:8px">
+    <input id="nick-input" type="text" placeholder="暱稱（7字內）" style="width:100%;margin-bottom:8px">
     <select id="role-select" style="width:100%;margin-bottom:12px">
       <option value="">請選擇定位</option>
       <option value="坦">坦</option>
@@ -1343,6 +1343,57 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
     const box=document.getElementById('auth-user-帳號');
     if(box) box.textContent='已登入：'+n;
   };
+})();
+</script>
+
+
+<script>
+(function(){
+  if(typeof firebase==='undefined'||!firebase.auth) return;
+  const auth=firebase.auth();
+  const db=firebase.database();
+
+  function charLen(str){
+    return Array.from(str||"").length;
+  }
+
+  function validNick(n){
+    return typeof n==='string' && charLen(n)>0 && charLen(n)<=7;
+  }
+
+  async function applyNickname(u){
+    const snap = await db.ref('test/users/'+u.uid).once('value');
+    if(snap.exists()){
+      const data = snap.val();
+      window.__userNickname = data.nickname;
+      const box = document.getElementById('auth-user-帳號');
+      if(box && data.nickname){
+        box.textContent = '已登入：' + data.nickname;
+      }
+    }
+  }
+
+  auth.onAuthStateChanged(async u=>{
+    if(!u || u.isAnonymous) return;
+    await applyNickname(u);
+  });
+
+  const confirmBtn = document.getElementById('nick-confirm');
+  if(confirmBtn){
+    confirmBtn.onclick = async ()=>{
+      const n = document.getElementById('nick-input').value.trim();
+      const r = document.getElementById('role-select').value;
+      if(!validNick(n)) return alert('暱稱需 7 個字以內');
+      if(!r) return alert('請選擇定位');
+      const u = auth.currentUser;
+      if(!u) return;
+      await db.ref('test/users/'+u.uid).set({nickname:n, role:r});
+      window.__userNickname = n;
+      document.getElementById('nick-modal').style.display='none';
+      const box=document.getElementById('auth-user-帳號');
+      if(box) box.textContent='已登入：'+n;
+    };
+  }
 })();
 </script>
 
