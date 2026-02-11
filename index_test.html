@@ -893,7 +893,7 @@ window.addEventListener("load",()=>{
   <div id="auth-guest">
     <div style="margin-bottom:6px;font-size:16px;font-weight:bold">匿名登入中</div>
     <input id="auth-帳號" placeholder="帳號" style="width:150px">
-    <input id="auth-pass" type="密碼" placeholder="密碼" style="width:120px">
+    <input id="auth-pass" type="password" placeholder="密碼" style="width:120px">
     <div style="margin-top:6px">
       <button id="btn-register">註冊</button>
       <button id="btn-login">登入</button>
@@ -1261,5 +1261,36 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 })();
 </script>
 
+
+<script>
+(function(){
+  if(typeof firebase==='undefined'||!firebase.auth) return;
+  const auth=firebase.auth();
+  function isValidUsername(u){return /^[A-Za-z0-9]{6,}$/.test(u||'');}
+  function isValidPassword(p){return typeof p==='string'&&p.length>=8;}
+  function toVirtualEmail(u){return (u||'').toLowerCase()+'@gamehost.local';}
+
+  document.getElementById('btn-register').onclick=async()=>{
+    const u=document.getElementById('auth-帳號').value.trim();
+    const p=document.getElementById('auth-pass').value;
+    if(!isValidUsername(u)) return alert('帳號需為英文或數字，至少 6 碼');
+    if(!isValidPassword(p)) return alert('密碼需至少 8 碼');
+    try{
+      await auth.createUserWithEmailAndPassword(toVirtualEmail(u),p);
+    }catch(e){alert(e.message);}
+  };
+
+  document.getElementById('btn-login').onclick=async()=>{
+    const u=document.getElementById('auth-帳號').value.trim();
+    const p=document.getElementById('auth-pass').value;
+    if(!isValidUsername(u)) return alert('帳號需為英文或數字，至少 6 碼');
+    if(!isValidPassword(p)) return alert('密碼需至少 8 碼');
+    try{
+      await auth.signInWithEmailAndPassword(toVirtualEmail(u),p);
+    }catch(e){alert(e.message);}
+  };
+})();
+</script>
 </body>
+
 </html>
