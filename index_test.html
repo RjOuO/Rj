@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.11-test</div>
+<div class="version-badge">v1.9.12-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.11-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.12-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.11-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.12-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.11-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.12-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2467,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.11-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.12-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2573,7 +2573,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.11-test GOOGLE ONLY LOGIN ===== */
+/* ===== v1.9.12-test GOOGLE ONLY LOGIN ===== */
 (function(){
 
   function replaceLoginUI(){
@@ -2604,6 +2604,44 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 
   document.addEventListener("DOMContentLoaded", replaceLoginUI);
+
+})();
+</script>
+
+
+<script>
+/* ===== v1.9.12-test GOOGLE ONLY CLEAN LOGIN ===== */
+(function(){
+
+  function forceGoogleOnly(){
+
+    const authBox = Array.from(document.querySelectorAll("div"))
+      .find(div => div.innerText.includes("帳號") && div.innerText.includes("密碼"));
+
+    if(!authBox) return;
+
+    authBox.innerHTML = "";
+
+    const googleBtn = document.createElement("button");
+    googleBtn.textContent = "使用 Google 登入";
+    googleBtn.style.padding = "8px 16px";
+    googleBtn.style.cursor = "pointer";
+    googleBtn.style.fontSize = "14px";
+
+    googleBtn.onclick = function(){
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider)
+        .catch(err => console.error("Google Login Error:", err));
+    };
+
+    authBox.appendChild(googleBtn);
+  }
+
+  const observer = new MutationObserver(()=>{
+    forceGoogleOnly();
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
 
 })();
 </script>
