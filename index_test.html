@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.4-test</div>
+<div class="version-badge">v1.9.5-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.4-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.5-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.4-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.5-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.4-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.5-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2378,6 +2378,109 @@ document.addEventListener("DOMContentLoaded", function(){
     if(!modalTitle) return;
 
     const modal = modalTitle.closest("div");
+    if(!modal) return;
+
+    if(modal.querySelector("#admin-user-list")) return;
+
+    const container = document.createElement("div");
+    container.id = "admin-user-list";
+    container.style.marginTop = "15px";
+    container.style.padding = "10px";
+    container.style.border = "1px solid #ddd";
+    container.style.borderRadius = "6px";
+    container.style.background = "#ffffff";
+
+    const title = document.createElement("div");
+    title.textContent = "目前註冊使用者";
+    title.style.fontWeight = "bold";
+    title.style.marginBottom = "8px";
+
+    const list = document.createElement("div");
+    const pagination = document.createElement("div");
+    pagination.style.marginTop = "8px";
+
+    let currentPage = 0;
+    const pageSize = 10;
+    let dataList = [];
+
+    function render(){
+      list.innerHTML = "";
+      const start = currentPage * pageSize;
+      const pageData = dataList.slice(start, start + pageSize);
+
+      pageData.forEach(user => {
+        const row = document.createElement("div");
+        row.style.padding = "4px 0";
+        row.style.borderBottom = "1px solid #eee";
+        row.textContent =
+          "暱稱: " + (user.nickname || "") +
+          " | 定位: " + (user.role || "");
+        list.appendChild(row);
+      });
+
+      pagination.innerHTML = "";
+
+      const prev = document.createElement("button");
+      prev.textContent = "上一頁";
+      prev.disabled = currentPage === 0;
+      prev.onclick = ()=>{ currentPage--; render(); };
+
+      const next = document.createElement("button");
+      next.textContent = "下一頁";
+      next.disabled = (start + pageSize) >= dataList.length;
+      next.style.marginLeft = "6px";
+      next.onclick = ()=>{ currentPage++; render(); };
+
+      pagination.appendChild(prev);
+      pagination.appendChild(next);
+    }
+
+    function loadUsers(){
+      firebase.database().ref("test/users").once("value").then(snapshot=>{
+        const val = snapshot.val() || {};
+        dataList = Object.values(val);
+        currentPage = 0;
+        render();
+      });
+    }
+
+    container.appendChild(title);
+    container.appendChild(list);
+    container.appendChild(pagination);
+
+    modal.appendChild(container);
+
+    loadUsers();
+  }
+
+  const observer = new MutationObserver(()=>{
+    injectAdminList();
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
+
+})();
+</script>
+
+
+<script>
+/* ===== v1.9.5-test ADMIN USER LIST FIXED TARGET ===== */
+(function(){
+
+  function injectAdminList(){
+
+    if(window.CURRENT_ROLE !== "admin") return;
+
+    const confirmBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => b.textContent.trim() === "確認");
+
+    if(!confirmBtn) return;
+
+    // 找主 modal 容器（往上找兩層）
+    let modal = confirmBtn.closest("div");
+    if(!modal) return;
+
+    modal = modal.parentElement;
     if(!modal) return;
 
     if(modal.querySelector("#admin-user-list")) return;
