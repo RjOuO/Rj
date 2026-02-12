@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.26-test</div>
+<div class="version-badge">v1.9.27-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.26-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.27-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.26-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.27-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.26-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.27-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.26-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.27-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.26-test : add close button to nickname/role modal === */
+/* === v1.9.27-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2623,17 +2623,12 @@ document.addEventListener("DOMContentLoaded", function(){
     if(modalContainer){
         
     // Remove entire modal overlay (both nickname modal + admin list)
-    
-    // Safely trigger original modal close flow
-    const cancelBtn = Array.from(modal.querySelectorAll("button"))
-        .find(b => b.textContent.includes("取消"));
-    if(cancelBtn){
-        cancelBtn.click();
-    }else{
-        // fallback: hide only guest/admin modal wrapper
-        modal.style.display = "none";
+    let overlay = modal;
+    while(overlay && overlay.parentElement !== document.body){
+        overlay = overlay.parentElement;
     }
-    
+    if(overlay){
+        overlay.remove();
     }
     
     }
