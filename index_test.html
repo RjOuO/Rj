@@ -84,7 +84,7 @@ input[type="checkbox"]{transform:scale(1.4)}
 
   <input id="帳號" placeholder="帳號">
   <input id="密碼" type="密碼" placeholder="密碼">
-  <button id="帳號Btn">綁定 / 登入 帳號</button>
+  
   <button id="googleBtn">綁定 / 使用 Google 登入</button>
 </div>
 
@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.15-test</div>
+<div class="version-badge">v1.9.16-test</div>
 
 
 
@@ -997,10 +997,10 @@ window.addEventListener("load",()=>{
   <div id="auth-guest">
     <div style="margin-bottom:6px;font-size:16px;font-weight:bold">匿名登入中</div>
     <input id="auth-帳號" placeholder="帳號" style="width:150px">
-    <input id="auth-pass" type="password" placeholder="密碼" style="width:120px">
+    
     <div style="margin-top:6px">
-      <button id="btn-register">註冊</button>
-      <button id="btn-login">登入</button>
+      
+      
       <button id="btn-google">使用 Google 登入</button>
     </div>
   </div>
@@ -1400,7 +1400,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 <div id="nick-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;">
   <div style="background:#fff;width:320px;max-width:90%;margin:15% auto;padding:16px;border-radius:10px;">
     <div style="font-size:16px;font-weight:bold;margin-bottom:8px">設定暱稱與定位</div>
-    <input id="nick-input" type="text" placeholder="暱稱（7字內）" style="pointer-events:auto" style="width:100%;margin-bottom:8px">
+    
     <select id="role-select" style="width:100%;margin-bottom:12px">
       <option value="">請選擇定位</option>
       <option value="坦">坦</option>
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.15-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.16-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.15-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.16-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.15-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.16-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2467,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.15-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.16-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2569,30 +2569,6 @@ document.addEventListener("DOMContentLoaded", function(){
   observer.observe(document.body, { childList:true, subtree:true });
 
 })();
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-
-  // Remove account/email inputs
-  document.querySelectorAll('input[type="text"], input[type="email"]').forEach(el=>{
-    if(el.closest("div")) el.closest("div").remove();
-  });
-
-  // Remove password inputs
-  document.querySelectorAll('input[type="password"]').forEach(el=>{
-    if(el.closest("div")) el.closest("div").remove();
-  });
-
-  // Remove non‑Google buttons
-  document.querySelectorAll("button").forEach(btn=>{
-    if(!btn.innerText.includes("Google")){
-      btn.remove();
-    }
-  });
-
-});
 </script>
 
 </body>
