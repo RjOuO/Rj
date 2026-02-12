@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.28-test</div>
+<div class="version-badge">v1.9.29-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.28-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.29-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.28-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.29-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.28-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.29-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.28-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.29-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.28-test : add close button to nickname/role modal === */
+/* === v1.9.29-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2616,24 +2616,21 @@ document.addEventListener("DOMContentLoaded", function(){
     closeBtn.style.cursor = "pointer";
     closeBtn.style.color = "#666";
 
-    closeBtn.onclick = () => {
-      
-    // Properly close modal by hiding it
-    const modalContainer = modal.closest("div");
-    if(modalContainer){
-        
-    // Remove entire modal overlay (both nickname modal + admin list)
-    let overlay = modal;
-    while(overlay && overlay.parentElement !== document.body){
-        overlay = overlay.parentElement;
-    }
-    if(overlay){
-        overlay.remove();
-    }
     
-    }
-    
-    };
+closeBtn.onclick = () => {
+  // Safe close: hide modal overlay without triggering confirm/cancel logic
+  let overlay = modal;
+  while (overlay && overlay.parentElement && overlay.parentElement !== document.body) {
+    overlay = overlay.parentElement;
+  }
+  if (overlay) {
+    overlay.style.display = "none";
+  }
+
+  // Restore interaction state explicitly
+  document.body.style.pointerEvents = "auto";
+};
+
 
     modal.appendChild(closeBtn);
   }
