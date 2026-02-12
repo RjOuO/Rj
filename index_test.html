@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.18-test</div>
+<div class="version-badge">v1.8.19-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.18-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.19-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.18-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.8.19-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2231,10 +2231,12 @@ document.addEventListener("DOMContentLoaded", function(){
     
     if(!box.querySelector(".admin-label")){
       box.style.flexWrap = "wrap";
+    box.style.alignItems = "flex-start";
       // 建立 admin row
       
     if(!box.querySelector(".admin-label")){
       box.style.flexWrap = "wrap";
+    box.style.alignItems = "flex-start";
       const label = document.createElement("div");
       label.className = "admin-label";
       label.textContent = "管理員";
@@ -2246,6 +2248,12 @@ document.addEventListener("DOMContentLoaded", function(){
       label.style.marginBottom = "6px";
 
       box.insertBefore(label, box.firstChild);
+
+    // 修正第二行按鈕對齊
+    const buttons = box.querySelectorAll("button");
+    buttons.forEach(btn=>{
+      btn.style.alignSelf = "center";
+    });
     }
 
     console.log("Admin UI Activated");
@@ -2307,7 +2315,14 @@ document.addEventListener("DOMContentLoaded", function(){
     label.style.flexBasis = "100%";
 
     box.style.flexWrap = "wrap";
+    box.style.alignItems = "flex-start";
     box.insertBefore(label, box.firstChild);
+
+    // 修正第二行按鈕對齊
+    const buttons = box.querySelectorAll("button");
+    buttons.forEach(btn=>{
+      btn.style.alignSelf = "center";
+    });
 
     console.log("Admin UI Activated");
   }
