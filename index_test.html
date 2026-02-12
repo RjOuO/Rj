@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.5-test</div>
+<div class="version-badge">v1.7.6-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-// ===== Admin System v1.7.5-test (MutationObserver Hard Bind) =====
+// ===== Admin System v1.7.6-test (MutationObserver Hard Bind) =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function applyAdminUI(user){
@@ -2199,6 +2199,57 @@ function applyAdminUI(user){
 if(typeof firebase !== "undefined"){
   firebase.auth().onAuthStateChanged(function(user){
     applyAdminUI(user);
+  });
+}
+</script>
+
+
+<script>
+// ===== Admin UI Hard Override v1.7.6-test =====
+const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
+
+function forceAdminBadge() {
+  const user = firebase?.auth()?.currentUser;
+  if (!user || user.email !== SUPER_ADMIN_EMAIL) return;
+
+  // 找左下角固定定位區塊 (通常是 position:fixed 且 left: 或 bottom: )
+  const candidates = Array.from(document.querySelectorAll("div"))
+    .filter(el => {
+      const style = window.getComputedStyle(el);
+      return style.position === "fixed" && style.bottom !== "auto";
+    });
+
+  if (!candidates.length) return;
+
+  const box = candidates[0];
+
+  if (box.querySelector(".admin-label")) return;
+
+  const label = document.createElement("div");
+  label.className = "admin-label";
+  label.innerText = "管理員";
+  label.style.fontSize = "14px";
+  label.style.color = "#ff4d4f";
+  label.style.fontWeight = "bold";
+  label.style.marginBottom = "6px";
+  label.style.textAlign = "center";
+
+  box.insertBefore(label, box.firstChild);
+}
+
+// 強制延遲 + 重試機制
+function initAdminWatcher() {
+  let attempts = 0;
+  const interval = setInterval(() => {
+    attempts++;
+    forceAdminBadge();
+    if (attempts > 20) clearInterval(interval);
+  }, 300);
+}
+
+if (typeof firebase !== "undefined") {
+  firebase.auth().onAuthStateChanged(() => {
+    setTimeout(initAdminWatcher, 300);
   });
 }
 </script>
