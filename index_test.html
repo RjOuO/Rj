@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.9.50-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.9.51-test</title>
 
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.50-test</div>
+<div class="version-badge">v1.9.51-test</div>
 
 
 
@@ -690,8 +690,8 @@ lockRef.on("value", s => {
   });
   resetBtn.disabled = locked;
 
-  // === v1.9.50-test : force hide/show + with core lock ===
-  root.querySelectorAll(".quick-add-btn").forEach(btn=>{
+  // === v1.9.51-test : force hide/show + with core lock ===
+  document.querySelectorAll(".quick-add-btn").forEach(btn=>{
     btn.style.display = locked ? "none" : "inline-block";
   });
 });
@@ -2172,7 +2172,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.50-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.51-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2207,7 +2207,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.50-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.51-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2380,7 +2380,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.50-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.51-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2483,7 +2483,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.50-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.51-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2589,7 +2589,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.50-test : add close button to nickname/role modal === */
+/* === v1.9.51-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2651,7 +2651,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.50-test : clean single quick-add implementation === */
+/* === v1.9.51-test : clean single quick-add implementation === */
 (function(){
 
   function initQuickAdd(){
@@ -2748,7 +2748,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-// ===== v1.9.50-test LockManager (Firebase-driven lock control) =====
+// ===== v1.9.51-test LockManager (Firebase-driven lock control) =====
 
 function initTableLock(tableId, db) {
     const lockedRef = firebase.database().ref("tables/" + tableId + "/locked");
@@ -2796,7 +2796,7 @@ function addMemberWithLockCheck(tableId) {
 
 
 <script>
-// ===== v1.9.50-test HARD LOCK OVERRIDE =====
+// ===== v1.9.51-test HARD LOCK OVERRIDE =====
 
 // Wait until everything is loaded
 window.addEventListener("load", function () {
@@ -2855,7 +2855,7 @@ window.addEventListener("load", function () {
 
 
 <script>
-// ===== v1.9.50-test FULL ADD BUTTON TAKEOVER =====
+// ===== v1.9.51-test FULL ADD BUTTON TAKEOVER =====
 
 window.addEventListener("load", function () {
 
@@ -2912,7 +2912,7 @@ window.addEventListener("load", function () {
 
 
 <script>
-/* === v1.9.50-test : SAFE integrated quick-add (+) === */
+/* === v1.9.51-test : SAFE integrated quick-add (+) === */
 (function(){
 
   function buildPlusButtons(){
@@ -3013,7 +3013,7 @@ window.addEventListener("load", function () {
 
 
 <script>
-/* === v1.9.50-test : Firebase-synced quick-add (+) === */
+/* === v1.9.51-test : Firebase-synced quick-add (+) === */
 (function(){
 
   function initPlus(){
