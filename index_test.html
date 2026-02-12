@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.7-test</div>
+<div class="version-badge">v1.9.8-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.7-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.8-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.7-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.8-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.7-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.8-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2431,7 +2431,7 @@ document.addEventListener("DOMContentLoaded", function(){
       const next = document.createElement("button");
       next.textContent = "下一頁";
       next.disabled = (start + pageSize) >= dataList.length;
-      next.style.marginLeft = "6px";
+      next.style.marginLeft = "2px";
       next.onclick = ()=>{ currentPage++; render(); };
 
       pagination.appendChild(prev);
@@ -2467,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.7-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.8-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2537,7 +2537,7 @@ document.addEventListener("DOMContentLoaded", function(){
       const next = document.createElement("button");
       next.textContent = "下一頁";
       next.disabled = (start + pageSize) >= dataList.length;
-      next.style.marginLeft = "6px";
+      next.style.marginLeft = "2px";
       next.onclick = ()=>{ currentPage++; render(); };
 
       pagination.appendChild(prev);
