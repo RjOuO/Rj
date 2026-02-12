@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.12-test</div>
+<div class="version-badge">v1.8.13-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.12-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.13-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.12-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.8.13-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2220,38 +2220,19 @@ document.addEventListener("DOMContentLoaded", function(){
     
     if(!box.querySelector(".admin-label")){
       // 建立 admin row
-      box.style.display = "block";
-      const adminRow = document.createElement("div");
-      adminRow.className = "admin-label";
-      adminRow.textContent = "管理員";
-      adminRow.style.fontSize = "12px";
-      adminRow.style.color = "#ff4d4f";
-      adminRow.style.fontWeight = "bold";
-      adminRow.style.marginBottom = "6px";
-
-      // 建立 flex row（包原本內容）
-      const flexRow = document.createElement("div");
       
-      flexRow.style.display = "flex";
-      flexRow.style.alignItems = "center";
-      flexRow.style.justifyContent = "flex-start";
-      flexRow.style.flexWrap = "nowrap";
-      flexRow.style.width = "100%";
-      flexRow.style.gap = "8px";
-      // 強制所有按鈕垂直置中
-      flexRow.querySelectorAll("button").forEach(btn=>{
-        btn.style.alignSelf = "center";
-      });
-    
+    if(!box.querySelector(".admin-label")){
+      const label = document.createElement("div");
+      label.className = "admin-label";
+      label.textContent = "管理員";
+      label.style.fontSize = "12px";
+      label.style.color = "#ff4d4f";
+      label.style.fontWeight = "bold";
+      label.style.flexBasis = "100%";
+      label.style.width = "100%";
+      label.style.marginBottom = "6px";
 
-      // 把原本子元素搬到 flexRow
-      while(box.firstChild){
-        flexRow.appendChild(box.firstChild);
-      }
-
-      // 清空 box 並重建結構
-      box.appendChild(adminRow);
-      box.appendChild(flexRow);
+      box.insertBefore(label, box.firstChild);
     }
 
     console.log("Admin UI Activated");
