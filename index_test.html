@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.2-test</div>
+<div class="version-badge">v1.9.3-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.2-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.3-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.2-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.3-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2356,7 +2356,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.2-test ADMIN APPLICATION VIEWER ===== */
+/* ===== v1.9.3-test ADMIN APPLICATION VIEWER ===== */
 (function(){
 
   function createAdminPanel(){
@@ -2437,7 +2437,7 @@ document.addEventListener("DOMContentLoaded", function(){
     function loadData(){
       if(typeof firebase === "undefined" || !firebase.database) return;
 
-      firebase.database().ref("applications").once("value").then(snapshot=>{
+      firebase.database().ref("test/users").once("value").then(snapshot=>{
         const val = snapshot.val() || {};
         dataList = Object.values(val);
         currentPage = 0;
@@ -2475,7 +2475,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.2-test ADMIN VIEW INSIDE EDIT ===== */
+/* ===== v1.9.3-test ADMIN VIEW INSIDE EDIT ===== */
 (function(){
 
   function injectAdminList(){
