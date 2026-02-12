@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.9-test</div>
+<div class="version-badge">v1.7.10-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-// ===== Admin System v1.7.9-test (MutationObserver Hard Bind) =====
+// ===== Admin System v1.7.10-test (MutationObserver Hard Bind) =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function applyAdminUI(user){
@@ -2205,7 +2205,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin UI Hard Override v1.7.9-test =====
+// ===== Admin UI Hard Override v1.7.10-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function forceAdminBadge() {
@@ -2256,7 +2256,7 @@ if (typeof firebase !== "undefined") {
 
 
 <script>
-// ===== Admin Nickname Insert v1.7.9-test =====
+// ===== Admin Nickname Insert v1.7.10-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function insertAdminNearNickname(user){
@@ -2297,7 +2297,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin Nickname Precise Insert v1.7.9-test =====
+// ===== Admin Nickname Precise Insert v1.7.10-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function insertAdminLabelPrecise(user){
@@ -2332,6 +2332,41 @@ function insertAdminLabelPrecise(user){
 if(typeof firebase !== "undefined"){
   firebase.auth().onAuthStateChanged(function(user){
     setTimeout(()=>insertAdminLabelPrecise(user),400);
+  });
+}
+</script>
+
+
+<script>
+// ===== Admin Nickname Exact Target v1.7.10-test =====
+const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
+
+function applyAdminExact(user){
+  if(!user || user.email !== SUPER_ADMIN_EMAIL) return;
+
+  const boxes = Array.from(document.querySelectorAll("div"))
+    .filter(el => el.innerText && el.innerText.includes("登出") && el.innerText.includes("編輯"));
+
+  if(!boxes.length) return;
+
+  const userBox = boxes[0];
+
+  if(userBox.querySelector(".admin-label")) return;
+
+  const label = document.createElement("div");
+  label.className = "admin-label";
+  label.textContent = "管理員";
+  label.style.fontSize = "12px";
+  label.style.color = "#ff4d4f";
+  label.style.fontWeight = "bold";
+  label.style.marginBottom = "4px";
+
+  userBox.insertBefore(label, userBox.firstChild);
+}
+
+if(typeof firebase !== "undefined"){
+  firebase.auth().onAuthStateChanged(function(user){
+    setTimeout(()=>applyAdminExact(user),500);
   });
 }
 </script>
