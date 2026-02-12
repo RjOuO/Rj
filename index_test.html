@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.1-test</div>
+<div class="version-badge">v1.8.2-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.1-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.2-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.1-test ADMIN UI BINDING ===== */
+/* ===== v1.8.2-test ADMIN UI BINDING ===== */
 (function(){
 
   function applyAdminUI(){
@@ -2232,6 +2232,72 @@ document.addEventListener("DOMContentLoaded", function(){
       clearInterval(roleWatcher);
     }
   },300);
+
+})();
+</script>
+
+
+<script>
+/* ===== v1.8.2-test ROLE + ADMIN UI FIXED ===== */
+(function(){
+  if(typeof firebase==='undefined' || !firebase.firestore) return;
+
+  const fsdb = firebase.firestore();
+  let CURRENT_ROLE = "guest";
+  window.CURRENT_ROLE = CURRENT_ROLE;
+
+  function applyAdminUI(){
+    if(CURRENT_ROLE !== "admin") return;
+
+    // 左下登入區塊（抓包含 登出 的容器）
+    const logoutBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => b.textContent.trim() === "登出");
+
+    if(!logoutBtn) return;
+
+    const box = logoutBtn.closest("div");
+    if(!box) return;
+
+    if(!box.querySelector(".admin-label")){
+      const label = document.createElement("div");
+      label.className = "admin-label";
+      label.textContent = "管理員";
+      label.style.fontSize = "12px";
+      label.style.color = "#ff4d4f";
+      label.style.fontWeight = "bold";
+      label.style.marginBottom = "4px";
+      box.prepend(label);
+    }
+
+    console.log("Admin UI Activated");
+  }
+
+  async function loadRole(user){
+    if(!user){
+      CURRENT_ROLE="guest";
+      window.CURRENT_ROLE=CURRENT_ROLE;
+      return;
+    }
+
+    try{
+      const doc = await fsdb.collection("roles").doc(user.email).get();
+      CURRENT_ROLE = doc.exists ? doc.data().role : "member";
+      window.CURRENT_ROLE = CURRENT_ROLE;
+      console.log("Role Loaded:", CURRENT_ROLE);
+
+      // 角色載入完成立即套用 UI
+      applyAdminUI();
+
+    }catch(e){
+      console.error("Role Load Error:", e);
+      CURRENT_ROLE="member";
+      window.CURRENT_ROLE=CURRENT_ROLE;
+    }
+  }
+
+  firebase.auth().onAuthStateChanged(user=>{
+    loadRole(user);
+  });
 
 })();
 </script>
