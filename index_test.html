@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.1-test</div>
+<div class="version-badge">v1.7.3-test</div>
 
 
 
@@ -2151,6 +2151,61 @@ document.addEventListener("DOMContentLoaded", function(){
   const badge = document.getElementById("app-version-badge");
   if(badge) badge.textContent = APP_VERSION;
 });
+</script>
+
+
+<script>
+// ===== Admin Override v1.7.3-test =====
+const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
+
+function forceAdminOverride(user) {
+  if (user && user.email === SUPER_ADMIN_EMAIL) {
+    user.isAdmin = true;
+    window.isAdmin = true;
+    console.log("Super Admin Override Active");
+  }
+}
+
+// Hook into Firebase auth state if exists
+if (typeof firebase !== "undefined") {
+  firebase.auth().onAuthStateChanged(function(user) {
+    forceAdminOverride(user);
+  });
+}
+</script>
+
+
+<script>
+// ===== Admin Label Inject v1.7.3-test =====
+const SUPER_ADMIN_EMAIL_LABEL = "a93771082@gmail.com";
+
+function injectAdminLabel(user) {
+  if (!user || user.email !== SUPER_ADMIN_EMAIL_LABEL) return;
+
+  // 嘗試抓取左下角使用者資訊區塊
+  const userBox = document.querySelector("#userBox, .user-box, .user-info, #userInfo");
+  if (!userBox) return;
+
+  // 避免重複插入
+  if (userBox.querySelector(".admin-label")) return;
+
+  const label = document.createElement("div");
+  label.className = "admin-label";
+  label.innerText = "管理員";
+  label.style.fontSize = "12px";
+  label.style.color = "#ff4d4f";
+  label.style.fontWeight = "bold";
+  label.style.marginBottom = "4px";
+
+  userBox.prepend(label);
+}
+
+// Firebase auth hook
+if (typeof firebase !== "undefined") {
+  firebase.auth().onAuthStateChanged(function(user) {
+    injectAdminLabel(user);
+  });
+}
 </script>
 
 </body>
