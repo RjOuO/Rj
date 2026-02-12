@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.23-test</div>
+<div class="version-badge">v1.9.24-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.23-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.24-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.23-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.24-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.23-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.24-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.23-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.24-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.23-test : add close button to nickname/role modal === */
+/* === v1.9.24-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2617,7 +2617,13 @@ document.addEventListener("DOMContentLoaded", function(){
     closeBtn.style.color = "#666";
 
     closeBtn.onclick = () => {
-      window.history.back();
+      
+    // Properly close modal by hiding it
+    const modalContainer = modal.closest("div");
+    if(modalContainer){
+        modalContainer.style.display = "none";
+    }
+    
     };
 
     modal.appendChild(closeBtn);
