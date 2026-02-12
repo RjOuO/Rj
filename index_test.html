@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.44-test</div>
+<div class="version-badge">v1.9.45-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.44-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.45-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.44-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.45-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.44-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.45-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.44-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.45-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.44-test : add close button to nickname/role modal === */
+/* === v1.9.45-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2646,7 +2646,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.44-test : clean single quick-add implementation === */
+/* === v1.9.45-test : clean single quick-add implementation === */
 (function(){
 
   function initQuickAdd(){
@@ -2743,7 +2743,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-// ===== v1.9.44-test LockManager (Firebase-driven lock control) =====
+// ===== v1.9.45-test LockManager (Firebase-driven lock control) =====
 
 function initTableLock(tableId, db) {
     const lockedRef = firebase.database().ref("tables/" + tableId + "/locked");
@@ -2791,7 +2791,7 @@ function addMemberWithLockCheck(tableId) {
 
 
 <script>
-// ===== v1.9.44-test HARD LOCK OVERRIDE =====
+// ===== v1.9.45-test HARD LOCK OVERRIDE =====
 
 // Wait until everything is loaded
 window.addEventListener("load", function () {
@@ -2846,6 +2846,63 @@ window.addEventListener("load", function () {
 
 });
 // ===== END HARD LOCK OVERRIDE =====
+</script>
+
+
+<script>
+// ===== v1.9.45-test FULL ADD BUTTON TAKEOVER =====
+
+window.addEventListener("load", function () {
+
+    if (typeof firebase === "undefined") return;
+
+    const db = firebase.database();
+
+    document.querySelectorAll("[id^='table-']").forEach(function (tableEl) {
+
+        const tableId = tableEl.id.replace("table-", "");
+        const addBtn = tableEl.querySelector(".add-btn");
+
+        if (!addBtn) return;
+
+        // 移除所有舊 inline onclick
+        addBtn.removeAttribute("onclick");
+
+        // 建立唯一新增入口
+        addBtn.onclick = async function () {
+
+            const snapshot = await db.ref("tables/" + tableId + "/locked").once("value");
+
+            if (snapshot.val() === true) {
+                return; // HARD STOP
+            }
+
+            // 呼叫原本新增函式（若存在）
+            if (typeof window.originalAddHandler === "function") {
+                window.originalAddHandler(tableId);
+            } else if (typeof window.addMember === "function") {
+                window.addMember(tableId);
+            }
+
+        };
+
+        // Firebase 監聽控制顯示
+        db.ref("tables/" + tableId + "/locked").on("value", function (snapshot) {
+
+            const locked = snapshot.val() === true;
+
+            if (locked) {
+                addBtn.style.display = "none";
+            } else {
+                addBtn.style.display = "inline-block";
+            }
+
+        });
+
+    });
+
+});
+// ===== END TAKEOVER =====
 </script>
 
 </body>
