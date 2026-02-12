@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>遊戲旅舍報團專用表（九團版） v1.9.52-test</title>
+<title>遊戲旅舍報團專用表（九團版） v1.9.53-test</title>
 
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f5f5f5;padding:30px}
@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.52-test</div>
+<div class="version-badge">v1.9.53-test</div>
 
 
 
@@ -445,7 +445,262 @@ firebase.initializeApp({
 const db=firebase.database();
 </script>
 
+<script>
+const weekdays=["日","一","二","三","四","五","六"];
+const groupNames=["第一團","第二團","第三團","第四團","第五團","第六團","第七團","第八團","第九團"];
+const grid=document.getElementById("grid");
+const floatingNav=document.getElementById("floatingNav");
 
+function scrollToGroup(n){
+  const el = document.getElementById("group-"+n);
+  if(!el) return;
+  const y = el.getBoundingClientRect().top + window.pageYOffset - 220;
+  window.scrollTo({top:y, behavior:"smooth"});
+}
+function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"})}
+
+for(let i=1;i<=9;i++){
+  const item=document.createElement("div"); item.className="nav-item";
+  const lock=document.createElement("span"); lock.className="nav-lock"; lock.textContent="🔒";
+  const btn=document.createElement("button"); btn.textContent=i; btn.onclick=()=>scrollToGroup(i);
+  const miss=document.createElement("span"); miss.className="nav-missing"; miss.id="nav-missing-"+i;
+  item.appendChild(lock); item.appendChild(btn); item.appendChild(miss); floatingNav.appendChild(item);
+  db.ref("test/groups/"+i+"/header/status").on("value",s=>{
+    const v=s.val()||"open"; btn.className="";
+    btn.classList.add(v==="full"?"nav-full":v==="done"?"nav-done":"nav-open");
+  });
+  db.ref("test/groups/"+i+"/meta/locked").on("value",s=>{lock.style.display=s.val()?"block":"none"});
+}
+const topItem=document.createElement("div"); topItem.className="nav-item";
+const topBtn=document.createElement("button"); topBtn.textContent="↑"; topBtn.classList.add("nav-top");
+topBtn.onclick=scrollToTop; topItem.appendChild(topBtn); floatingNav.appendChild(topItem);
+const onlineDiv=document.createElement("div");
+onlineDiv.className="online-count";
+onlineDiv.id="onlineCount";
+onlineDiv.textContent="線上人數：0";
+floatingNav.appendChild(onlineDiv);
+
+function generateTimeOptions(){let html='<option></option>';for(let h=0;h<24;h++){const hh=String(h).padStart(2,"0");html+=`<option>${hh}:00</option><option>${hh}:30</option>`}return html}
+
+for(let t=1;t<=9;t++){
+  const wrap=document.createElement("div"); wrap.id="group-"+t;
+  wrap.innerHTML=`<table>
+    <tr><td colspan="4">
+      <button class="lock-btn">🔓 解鎖中</button>&nbsp;&nbsp;
+      <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
+      <span class="reset-missing" id="reset-missing-${t}"></span>
+    </td></tr>
+    <tr><td class="title">報團時間</td><td><input type="date" class="date-input"></td><td class="gray-cell weekday-cell"></td><td><select class="dropdown time-select">${generateTimeOptions()}</select></td></tr>
+    <tr><td class="header">選擇副本</td><td class="header">等級</td><td class="header">隊長ID</td><td class="header">狀態</td></tr>
+    <tr>
+      <td><select class="dropdown instance-select">
+        <option value=""></option>
+        <option value="normal">一般10人俠境</option>
+        <option value="trial">試劍</option>
+        <option value="guild">百業10人俠境</option>
+        <option value="mix">百業+一般俠境</option>
+      </select></td>
+      <td><select class="dropdown level-select"><option></option><option>61</option><option>71</option><option>81</option><option>86</option><option>91</option><option>96</option><option>100</option></select></td>
+      <td><input class="leader-input"></td>
+      <td><select class="dropdown status-select"><option value="open">未滿</option><option value="full">滿團</option><option value="done">完成</option></select></td>
+    </tr>
+    <tr><td class="header">角色ID</td><td class="header">定位</td><td class="header">DC語音</td><td class="header">備註</td></tr>
+    ${Array.from({length:10}).map(()=>`
+      <tr class="role-row">
+        <td><input></td>
+        <td><select class="dropdown role-select"><option></option><option>坦</option><option>全奶</option><option>輸出</option><option>奶坦</option><option>輸出奶</option></select></td>
+        <td><input type="checkbox"></td>
+        <td><input></td>
+      </tr>`).join("")}
+  </table>`;
+  grid.appendChild(wrap);
+  initTable(wrap,t);
+}
+
+function initTable(root,idx){
+  const base=db.ref("test/groups/"+idx);
+  const lockRef=base.child("meta/locked");
+  const statusRef=base.child("header/status");
+  const dateInput=root.querySelector(".date-input");
+  const weekdayCell=root.querySelector(".weekday-cell");
+  const timeSelect=root.querySelector(".time-select");
+  const instance=root.querySelector(".instance-select");
+  const level=root.querySelector(".level-select");
+  const leader=root.querySelector(".leader-input");
+  const status=root.querySelector(".status-select");
+  const resetBtn=root.querySelector(".reset-btn");
+  const lockBtn=root.querySelector(".lock-btn");
+  const rows=[...root.querySelectorAll(".role-row")];
+  const inputs=[...root.querySelectorAll("input,select")];
+
+  root.dataset.max = "10";
+
+  function updateWeekday(){
+    if(!dateInput.value){weekdayCell.textContent="";return;}
+    const d=new Date(dateInput.value); weekdayCell.textContent="星期"+weekdays[d.getDay()];
+  }
+
+  function applyRules(){
+    instance.className="dropdown instance-"+(instance.value||"empty");
+    status.className="dropdown status-"+status.value;
+
+    const MAX = (instance.value==="trial") ? 5 : 10;
+    root.dataset.max = String(MAX);
+
+    const cur = level.value;
+    if(instance.value==="trial"){
+      level.innerHTML=`<option></option>
+        <option>16</option><option>31</option><option>41</option><option>51</option>
+        <option>56</option><option>61</option><option>66</option><option>71</option>
+        <option>81</option><option>86</option><option>91</option><option>96</option><option>100</option>`;
+    }else{
+      level.innerHTML=`<option></option>
+        <option>51</option><option>56</option><option>61</option><option>66</option>
+        <option>71</option><option>81</option><option>86</option>
+        <option>91</option><option>96</option><option>100</option>`;
+    }
+    level.value = cur;
+
+    const isLocked = root.dataset.locked==="1";
+    rows.forEach((r,i)=>{
+      r.classList.remove("trial-locked","role-full","role-done");
+      if(!isLocked){
+        r.querySelectorAll("input,select").forEach(el=>el.disabled=false);
+      }
+      if(instance.value==="trial" && i>=5){
+        r.classList.add("trial-locked");
+        r.querySelectorAll("input,select").forEach(el=>el.disabled=true);
+      }
+      if(status.value!=="open"){
+        r.classList.add(status.value==="full"?"role-full":"role-done");
+        r.querySelectorAll("td:nth-child(-n+3) input,select").forEach(el=>el.disabled=true);
+      }
+      const sel=r.querySelector(".role-select");
+      sel.parentElement.className={"坦":"role-cell-tank","全奶":"role-cell-heal","輸出":"role-cell-dps","奶坦":"role-cell-ht","輸出奶":"role-cell-dh"}[sel.value]||"role-cell-empty";
+    });
+
+    window.__recalcMissing && window.__recalcMissing();
+  }
+
+  [[dateInput,"date"],[timeSelect,"time"],[instance,"instance"],[level,"level"],[leader,"leader"]].forEach(([el,k])=>{
+    const ref=base.child("header/"+k);
+    el.onchange=()=>ref.set(el.value);
+    ref.on("value",s=>{el.value=s.val()||"";updateWeekday();applyRules()});
+  });
+
+  statusRef.once("value").then(s=>{if(s.val()===null) statusRef.set("open")});
+  status.onchange=()=>statusRef.set(status.value);
+  statusRef.on("value",s=>{status.value=s.val()||"open";updateWeekday();applyRules()});
+
+  rows.forEach((r,i)=>{
+    r.querySelectorAll("input,select").forEach(el=>{
+      const key=el.type==="checkbox"?"dc":el.classList.contains("role-select")?"role":el===r.children[0].querySelector("input")?"name":"note";
+      const ref=base.child("roles/"+i+"/"+key);
+      el.onchange=()=>ref.set(el.type==="checkbox"?el.checked:el.value);
+      ref.on("value",s=>{el.type==="checkbox"?el.checked=!!s.val():el.value=s.val()||"";applyRules()});
+    });
+  });
+
+  
+
+
+
+
+lockBtn.onclick = async () => {
+
+  const user = firebase.auth().currentUser;
+  if (!user || user.isAnonymous) {
+    alert("請登入正式帳號後再操作");
+    return;
+  }
+
+  const dbRef = firebase.database();
+  const wantLock = lockBtn.textContent.includes("解鎖");
+
+  const lockUrl = lockRef.toString(); // full DB path as unique ID
+  const userLockRef = dbRef.ref("test/userActiveLock/" + user.uid);
+
+  if (wantLock) {
+
+    // 1️⃣ Check existing active lock
+    const activeSnap = await userLockRef.once("value");
+    if (activeSnap.exists()) {
+      const oldLockUrl = activeSnap.val();
+      if (oldLockUrl && oldLockUrl !== lockUrl) {
+        try {
+          await dbRef.refFromURL(oldLockUrl).remove();
+        } catch (e) {
+          console.error("解除舊鎖失敗:", e);
+        }
+      }
+    }
+
+    // 2️⃣ Get nickname
+    const userSnap = await dbRef.ref("test/users/" + user.uid).once("value");
+    if (!userSnap.exists()) {
+      alert("無法取得使用者資料");
+      return;
+    }
+
+    const nickname = userSnap.val().nickname;
+
+    // 3️⃣ Lock current table
+    await lockRef.set({
+      uid: user.uid,
+      nickname: nickname
+    });
+
+    // 4️⃣ Update active lock index
+    await userLockRef.set(lockUrl);
+
+  } else {
+
+    const lockSnap = await lockRef.once("value");
+    if (!lockSnap.exists()) return;
+
+    const data = lockSnap.val();
+    if (data.uid !== user.uid) {
+      alert("只有鎖定者可以解除");
+      return;
+    }
+
+    await lockRef.remove();
+    await userLockRef.remove();
+  }
+};
+
+
+
+
+
+  
+lockRef.on("value", s => {
+  const data = s.val();
+  const locked = !!data;
+
+  root.dataset.locked = locked ? "1" : "0";
+  lockBtn.textContent = locked && data && data.nickname ? "🔒 " + data.nickname + "已鎖定" : "🔓 解鎖中";
+
+  
+
+  
+
+  root.querySelectorAll("input,select").forEach(el=>{
+    el.disabled = locked;
+  });
+  resetBtn.disabled = locked;
+
+  // === v1.9.53-test : minimal + visibility control ===
+  document.querySelectorAll(".quick-add-btn").forEach(btn=>{
+    btn.style.display = locked ? "none" : "inline-block";
+  });
+});
+
+
+  resetBtn.onclick=()=>{if(resetBtn.disabled) return; if(!confirm("確定要清除目前團隊內容嗎？")) return; base.set({})};
+  updateWeekday(); applyRules();
+}
+</script>
 <script>
 
 // === TEST : FORCE inline diagonal background ===
@@ -1917,7 +2172,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.52-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.53-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -1952,7 +2207,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.52-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.53-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2125,7 +2380,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.52-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.53-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2228,7 +2483,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.52-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.53-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2334,7 +2589,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.52-test : add close button to nickname/role modal === */
+/* === v1.9.53-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2395,11 +2650,105 @@ closeBtn.onclick = () => {
 </script>
 
 
+<script>
+/* === v1.9.53-test : clean single quick-add implementation === */
+(function(){
 
+  function initQuickAdd(){
+
+    const user = firebase.auth().currentUser;
+    if(!user || user.isAnonymous) return;
+
+    document.querySelectorAll("table").forEach(table=>{
+
+      const tableRoot = table.closest(".table-root") || table.parentElement;
+      if(!tableRoot) return;
+
+      table.querySelectorAll("tr").forEach(row=>{
+
+        if(!row.querySelector("input[type='checkbox']")) return;
+
+        if(row.querySelector(".quick-add-btn")) return;
+
+        row.style.position = "relative";
+
+        const btn = document.createElement("button");
+        btn.textContent = "+";
+        btn.className = "quick-add-btn";
+
+        btn.style.position = "absolute";
+        btn.style.right = "-34px";
+        btn.style.top = "50%";
+        btn.style.transform = "translateY(-50%)";
+        btn.style.width = "26px";
+        btn.style.height = "26px";
+        btn.style.borderRadius = "50%";
+        btn.style.border = "1px solid #666";
+        btn.style.background = "#fff";
+        btn.style.cursor = "pointer";
+        btn.style.fontWeight = "bold";
+
+        btn.onclick = async () => {
+
+          if(tableRoot.classList.contains("locked")) return;
+
+          const snap = await firebase.database()
+            .ref("test/users/" + user.uid)
+            .once("value");
+
+          if(!snap.exists()) return;
+
+          const data = snap.val();
+
+          const nameInput = row.children[0].querySelector("input");
+          const roleSelect = row.querySelector("select");
+
+          if(nameInput) nameInput.value = data.nickname || "";
+          if(roleSelect) roleSelect.value = data.role || "";
+
+          nameInput && nameInput.dispatchEvent(new Event("change"));
+          roleSelect && roleSelect.dispatchEvent(new Event("change"));
+        };
+
+        row.appendChild(btn);
+      });
+
+    });
+  }
+
+  function updateLockState(){
+
+    document.querySelectorAll("table").forEach(table=>{
+
+      const tableRoot = table.closest(".table-root") || table.parentElement;
+      const isLocked = tableRoot.classList.contains("locked");
+
+      table.querySelectorAll(".quick-add-btn").forEach(btn=>{
+        btn.style.display = isLocked ? "none" : "block";
+      });
+
+    });
+  }
+
+  firebase.auth().onAuthStateChanged(()=>{
+    setTimeout(()=>{
+      initQuickAdd();
+      updateLockState();
+    },300);
+  });
+
+  const observer = new MutationObserver(()=>{
+    updateLockState();
+  });
+
+  observer.observe(document.body, {subtree:true, attributes:true, attributeFilter:["class"]});
+
+})();
+</script>
 
 
 <script>
-// ===== v1.9.52-test LockManager (Firebase-driven lock control) =====
+// ===== v1.9.53-test LockManager (Firebase-driven lock control) =====
 
 function initTableLock(tableId, db) {
     const lockedRef = firebase.database().ref("tables/" + tableId + "/locked");
@@ -2447,7 +2796,7 @@ function addMemberWithLockCheck(tableId) {
 
 
 <script>
-// ===== v1.9.52-test HARD LOCK OVERRIDE =====
+// ===== v1.9.53-test HARD LOCK OVERRIDE =====
 
 // Wait until everything is loaded
 window.addEventListener("load", function () {
@@ -2506,7 +2855,7 @@ window.addEventListener("load", function () {
 
 
 <script>
-// ===== v1.9.52-test FULL ADD BUTTON TAKEOVER =====
+// ===== v1.9.53-test FULL ADD BUTTON TAKEOVER =====
 
 window.addEventListener("load", function () {
 
@@ -2559,94 +2908,6 @@ window.addEventListener("load", function () {
 
 });
 // ===== END TAKEOVER =====
-</script>
-
-
-
-
-
-
-
-
-<script>
-/* === v1.9.52-test : gated quick-add (no create if locked/anonymous) === */
-(function(){
-
-  function buildPlus(){
-
-    const user = firebase.auth().currentUser;
-    if(!user || user.isAnonymous) return;
-
-    document.querySelectorAll("[id^='group-']").forEach(group=>{
-
-      const idx = group.id.replace("group-","");
-      const lockRef = firebase.database().ref("test/groups/"+idx+"/meta/locked");
-
-      lockRef.once("value").then(snap=>{
-
-        if(snap.exists()) return; // 🔒 locked → DO NOT CREATE +
-
-        const rows = group.querySelectorAll(".role-row");
-
-        rows.forEach(row=>{
-
-          if(row.querySelector(".quick-add-btn")) return;
-
-          const btn = document.createElement("button");
-          btn.textContent = "+";
-          btn.className = "quick-add-btn";
-
-          btn.style.position = "absolute";
-          btn.style.right = "-34px";
-          btn.style.top = "50%";
-          btn.style.transform = "translateY(-50%)";
-          btn.style.width = "26px";
-          btn.style.height = "26px";
-          btn.style.borderRadius = "50%";
-          btn.style.border = "1px solid #666";
-          btn.style.background = "#fff";
-          btn.style.cursor = "pointer";
-          btn.style.fontWeight = "bold";
-
-          row.style.position = "relative";
-          row.appendChild(btn);
-
-          btn.onclick = async () => {
-
-            const snapLock = await lockRef.once("value");
-            if(snapLock.exists()) return;
-
-            const snapUser = await firebase.database()
-              .ref("test/users/" + user.uid)
-              .once("value");
-
-            if(!snapUser.exists()) return;
-
-            const data = snapUser.val();
-
-            const nameInput = row.children[0].querySelector("input");
-            const roleSelect = row.querySelector(".role-select");
-
-            if(nameInput) nameInput.value = data.nickname || "";
-            if(roleSelect) roleSelect.value = data.role || "";
-
-            nameInput && nameInput.dispatchEvent(new Event("change"));
-            roleSelect && roleSelect.dispatchEvent(new Event("change"));
-          };
-
-        });
-
-      });
-
-    });
-
-  }
-
-  firebase.auth().onAuthStateChanged(()=>{
-    setTimeout(buildPlus,300);
-  });
-
-})();
 </script>
 
 </body>
