@@ -84,7 +84,7 @@ input[type="checkbox"]{transform:scale(1.4)}
 
   <input id="帳號" placeholder="帳號">
   <input id="密碼" type="密碼" placeholder="密碼">
-  <button id="帳號Btn">綁定 / 登入 帳號</button>
+  
   <button id="googleBtn">綁定 / 使用 Google 登入</button>
 </div>
 
@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.12-test</div>
+<div class="version-badge">v1.9.10-test</div>
 
 
 
@@ -475,8 +475,8 @@ for(let t=1;t<=9;t++){
   const wrap=document.createElement("div"); wrap.id="group-"+t;
   wrap.innerHTML=`<table>
     <tr><td colspan="4">
-      <button class="lock-btn">🔓 解鎖中</button>&nbsp;&nbsp;
-      <button class="reset-btn">一鍵清除（${groupNames[t-1]}）</button>
+      &nbsp;&nbsp;
+      
       <span class="reset-missing" id="reset-missing-${t}"></span>
     </td></tr>
     <tr><td class="title">報團時間</td><td><input type="date" class="date-input"></td><td class="gray-cell weekday-cell"></td><td><select class="dropdown time-select">${generateTimeOptions()}</select></td></tr>
@@ -997,16 +997,16 @@ window.addEventListener("load",()=>{
   <div id="auth-guest">
     <div style="margin-bottom:6px;font-size:16px;font-weight:bold">匿名登入中</div>
     <input id="auth-帳號" placeholder="帳號" style="width:150px">
-    <input id="auth-pass" type="password" placeholder="密碼" style="width:120px">
+    
     <div style="margin-top:6px">
-      <button id="btn-register">註冊</button>
-      <button id="btn-login">登入</button>
+      
+      
       <button id="btn-google">使用 Google 登入</button>
     </div>
   </div>
   <div id="auth-user-box" style="display:none">
     <div id="auth-user-帳號" style="margin-bottom:6px"></div>
-    <button id="btn-logout">登出</button>
+    
   </div>
 </div>
 
@@ -1400,7 +1400,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 <div id="nick-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;">
   <div style="background:#fff;width:320px;max-width:90%;margin:15% auto;padding:16px;border-radius:10px;">
     <div style="font-size:16px;font-weight:bold;margin-bottom:8px">設定暱稱與定位</div>
-    <input id="nick-input" type="text" placeholder="暱稱（7字內）" style="pointer-events:auto" style="width:100%;margin-bottom:8px">
+    
     <select id="role-select" style="width:100%;margin-bottom:12px">
       <option value="">請選擇定位</option>
       <option value="坦">坦</option>
@@ -1409,7 +1409,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
       <option value="輸出奶">輸出奶</option>
       <option value="奶坦">奶坦</option>
     </select>
-    <button id="nick-confirm" style="width:100%;display:block;pointer-events:auto">確認</button>
+    
   </div>
 </div>
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.12-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.10-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.12-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.10-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.12-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.10-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2467,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.12-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.10-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2564,81 +2564,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
   const observer = new MutationObserver(()=>{
     injectAdminList();
-  });
-
-  observer.observe(document.body, { childList:true, subtree:true });
-
-})();
-</script>
-
-
-<script>
-/* ===== v1.9.12-test GOOGLE ONLY LOGIN ===== */
-(function(){
-
-  function replaceLoginUI(){
-
-    const loginBtn = Array.from(document.querySelectorAll("button"))
-      .find(b => b.textContent.trim() === "登入");
-
-    if(!loginBtn) return;
-
-    const container = loginBtn.closest("div");
-    if(!container) return;
-
-    // 清空原本登入/註冊UI
-    container.innerHTML = "";
-
-    const googleBtn = document.createElement("button");
-    googleBtn.textContent = "使用 Google 登入";
-    googleBtn.style.padding = "6px 12px";
-    googleBtn.style.cursor = "pointer";
-
-    googleBtn.onclick = function(){
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .catch(err => console.error("Google Login Error:", err));
-    };
-
-    container.appendChild(googleBtn);
-  }
-
-  document.addEventListener("DOMContentLoaded", replaceLoginUI);
-
-})();
-</script>
-
-
-<script>
-/* ===== v1.9.12-test GOOGLE ONLY CLEAN LOGIN ===== */
-(function(){
-
-  function forceGoogleOnly(){
-
-    const authBox = Array.from(document.querySelectorAll("div"))
-      .find(div => div.innerText.includes("帳號") && div.innerText.includes("密碼"));
-
-    if(!authBox) return;
-
-    authBox.innerHTML = "";
-
-    const googleBtn = document.createElement("button");
-    googleBtn.textContent = "使用 Google 登入";
-    googleBtn.style.padding = "8px 16px";
-    googleBtn.style.cursor = "pointer";
-    googleBtn.style.fontSize = "14px";
-
-    googleBtn.onclick = function(){
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .catch(err => console.error("Google Login Error:", err));
-    };
-
-    authBox.appendChild(googleBtn);
-  }
-
-  const observer = new MutationObserver(()=>{
-    forceGoogleOnly();
   });
 
   observer.observe(document.body, { childList:true, subtree:true });
