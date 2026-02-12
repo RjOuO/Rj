@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.1-test</div>
+<div class="version-badge">v1.9.2-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.1-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.2-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.1-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.2-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2356,7 +2356,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.1-test ADMIN APPLICATION VIEWER ===== */
+/* ===== v1.9.2-test ADMIN APPLICATION VIEWER ===== */
 (function(){
 
   function createAdminPanel(){
@@ -2452,7 +2452,7 @@ document.addEventListener("DOMContentLoaded", function(){
     editBtn.parentElement.appendChild(panel);
 
     const viewBtn = document.createElement("button");
-    viewBtn.textContent = "檢視申請人";
+    viewBtn.textContent = "";
     viewBtn.style.marginLeft = "6px";
     viewBtn.onclick = () => {
       panel.style.display = panel.style.display === "none" ? "block" : "none";
@@ -2475,7 +2475,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.1-test ADMIN VIEW INSIDE EDIT ===== */
+/* ===== v1.9.2-test ADMIN VIEW INSIDE EDIT ===== */
 (function(){
 
   function injectAdminList(){
@@ -2549,12 +2549,16 @@ document.addEventListener("DOMContentLoaded", function(){
     function loadUsers(){
       if(!firebase || !firebase.database) return;
 
-      firebase.database().ref("users").once("value").then(snapshot=>{
-        const val = snapshot.val() || {};
-        dataList = Object.values(val);
+      
+      firebase.database().ref().once("value").then(snapshot=>{
+        const root = snapshot.val() || {};
+        // 嘗試常見節點
+        const source = root.users || root.members || root.applications || {};
+        dataList = Object.values(source);
         currentPage = 0;
         render();
       });
+    
     }
 
     container.appendChild(title);
