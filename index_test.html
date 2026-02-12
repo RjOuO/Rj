@@ -400,19 +400,11 @@ body{
 
 
 <style>
-/* Hide login account/password fields only */
-input[placeholder*="帳號"],
-input[placeholder*="Email"],
-input[placeholder*="email"],
-input[placeholder*="密碼"],
-input[type="password"]{
-    display:none !important;
-}
-
-/* Hide normal login/register buttons (not Google) */
-button{
-}
-button:not([id*="google"]):not([class*="google"]){
+/* Hide only guest account/password login controls */
+#auth-帳號,
+#auth-pass,
+#btn-register,
+#btn-login{
     display:none !important;
 }
 </style>
@@ -420,7 +412,7 @@ button:not([id*="google"]):not([class*="google"]){
 </head>
 
 <body>
-<div class="version-badge">v1.9.19-test</div>
+<div class="version-badge">v1.9.21-test</div>
 
 
 
@@ -2175,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.19-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.21-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2210,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.19-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.21-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2383,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.19-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.21-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2486,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.19-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.21-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2588,35 +2580,6 @@ document.addEventListener("DOMContentLoaded", function(){
   observer.observe(document.body, { childList:true, subtree:true });
 
 })();
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-
-  // Find Google login button
-  const googleBtn = Array.from(document.querySelectorAll("button"))
-      .find(b => b.innerText.includes("Google"));
-
-  if(!googleBtn) return;
-
-  // Limit scope to its container
-  const container = googleBtn.closest("div");
-  if(!container) return;
-
-  // Hide only account/password inputs inside this container
-  container.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(el=>{
-      el.style.display = "none";
-  });
-
-  // Hide login/register buttons inside this container (but keep Google)
-  container.querySelectorAll("button").forEach(btn=>{
-      if(!btn.innerText.includes("Google")){
-          btn.style.display = "none";
-      }
-  });
-
-});
 </script>
 
 </body>
