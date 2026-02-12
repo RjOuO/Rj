@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.21-test</div>
+<div class="version-badge">v1.9.22-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.21-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.22-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.21-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.22-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.21-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.22-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.21-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.22-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2575,6 +2575,56 @@ document.addEventListener("DOMContentLoaded", function(){
 
   const observer = new MutationObserver(()=>{
     injectAdminList();
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
+
+})();
+</script>
+
+
+<script>
+/* === v1.9.22-test : add close button to nickname/role modal === */
+(function(){
+
+  function injectCloseBtn(){
+
+    const confirmBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => b.textContent.trim() === "確認");
+
+    if(!confirmBtn) return;
+
+    const modal = confirmBtn.closest("div");
+    if(!modal) return;
+
+    if(modal.querySelector(".modal-close-btn")) return;
+
+    // avoid affecting admin modal
+    if(modal.querySelector("#admin-user-list")) return;
+
+    modal.style.position = "relative";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "✕";
+    closeBtn.className = "modal-close-btn";
+    closeBtn.style.position = "absolute";
+    closeBtn.style.top = "6px";
+    closeBtn.style.right = "8px";
+    closeBtn.style.border = "none";
+    closeBtn.style.background = "transparent";
+    closeBtn.style.fontSize = "16px";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.style.color = "#666";
+
+    closeBtn.onclick = () => {
+      modal.remove();
+    };
+
+    modal.appendChild(closeBtn);
+  }
+
+  const observer = new MutationObserver(()=>{
+    injectCloseBtn();
   });
 
   observer.observe(document.body, { childList:true, subtree:true });
