@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.6-test</div>
+<div class="version-badge">v1.7.7-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-// ===== Admin System v1.7.6-test (MutationObserver Hard Bind) =====
+// ===== Admin System v1.7.7-test (MutationObserver Hard Bind) =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function applyAdminUI(user){
@@ -2205,7 +2205,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin UI Hard Override v1.7.6-test =====
+// ===== Admin UI Hard Override v1.7.7-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function forceAdminBadge() {
@@ -2250,6 +2250,47 @@ function initAdminWatcher() {
 if (typeof firebase !== "undefined") {
   firebase.auth().onAuthStateChanged(() => {
     setTimeout(initAdminWatcher, 300);
+  });
+}
+</script>
+
+
+<script>
+// ===== Admin Nickname Insert v1.7.7-test =====
+const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
+
+function insertAdminNearNickname(user){
+  if(!user || user.email !== SUPER_ADMIN_EMAIL) return;
+
+  const logoutBtn = Array.from(document.querySelectorAll("button"))
+    .find(btn => btn.innerText && btn.innerText.includes("登出"));
+
+  if(!logoutBtn) return;
+
+  const container = logoutBtn.parentElement;
+  if(!container) return;
+
+  // 找暱稱元素（通常是按鈕前的第一個非按鈕節點）
+  const nicknameEl = Array.from(container.childNodes)
+    .find(node => node.nodeType === 1 && node.tagName !== "BUTTON");
+
+  if(!nicknameEl) return;
+  if(container.querySelector(".admin-label")) return;
+
+  const label = document.createElement("div");
+  label.className = "admin-label";
+  label.innerText = "管理員";
+  label.style.fontSize = "12px";
+  label.style.color = "#ff4d4f";
+  label.style.fontWeight = "bold";
+  label.style.marginBottom = "4px";
+
+  container.insertBefore(label, nicknameEl);
+}
+
+if(typeof firebase !== "undefined"){
+  firebase.auth().onAuthStateChanged(function(user){
+    setTimeout(()=>insertAdminNearNickname(user),500);
   });
 }
 </script>
