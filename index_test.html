@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.26-test</div>
+<div class="version-badge">v1.9.0-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.26-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.0-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.26-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.0-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2351,6 +2351,125 @@ document.addEventListener("DOMContentLoaded", function(){
   observer.observe(document.body, { childList: true, subtree: true });
 
   document.addEventListener("DOMContentLoaded", safeAdminInject);
+})();
+</script>
+
+
+<script>
+/* ===== v1.9.0-test ADMIN APPLICATION VIEWER ===== */
+(function(){
+
+  function createAdminPanel(){
+
+    if(typeof window.CURRENT_ROLE === "undefined") return;
+    if(window.CURRENT_ROLE !== "admin") return;
+
+    if(document.getElementById("admin-application-panel")) return;
+
+    const editBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => b.textContent.trim() === "編輯");
+
+    if(!editBtn) return;
+
+    const panel = document.createElement("div");
+    panel.id = "admin-application-panel";
+    panel.style.marginTop = "10px";
+    panel.style.padding = "10px";
+    panel.style.border = "1px solid #ccc";
+    panel.style.borderRadius = "6px";
+    panel.style.background = "#fafafa";
+    panel.style.display = "none";
+
+    const title = document.createElement("div");
+    title.textContent = "申請人列表";
+    title.style.fontWeight = "bold";
+    title.style.marginBottom = "8px";
+
+    const listContainer = document.createElement("div");
+    const pagination = document.createElement("div");
+    pagination.style.marginTop = "8px";
+
+    let currentPage = 0;
+    const pageSize = 10;
+    let dataList = [];
+
+    function renderPage(){
+      listContainer.innerHTML = "";
+      const start = currentPage * pageSize;
+      const pageData = dataList.slice(start, start + pageSize);
+
+      pageData.forEach(item => {
+        const row = document.createElement("div");
+        row.style.borderBottom = "1px solid #eee";
+        row.style.padding = "4px 0";
+        row.textContent =
+          "暱稱: " + (item.nickname || "") +
+          " | 定位: " + (item.position || "") +
+          " | 帳號: " + (item.account || "") +
+          " | 密碼: " + (item.password || "");
+        listContainer.appendChild(row);
+      });
+
+      pagination.innerHTML = "";
+
+      const prev = document.createElement("button");
+      prev.textContent = "上一頁";
+      prev.disabled = currentPage === 0;
+      prev.onclick = () => {
+        currentPage--;
+        renderPage();
+      };
+
+      const next = document.createElement("button");
+      next.textContent = "下一頁";
+      next.disabled = (start + pageSize) >= dataList.length;
+      next.style.marginLeft = "6px";
+      next.onclick = () => {
+        currentPage++;
+        renderPage();
+      };
+
+      pagination.appendChild(prev);
+      pagination.appendChild(next);
+    }
+
+    // 模擬資料來源（請替換成實際 Firebase 讀取）
+    function loadData(){
+      if(typeof firebase === "undefined" || !firebase.database) return;
+
+      firebase.database().ref("applications").once("value").then(snapshot=>{
+        const val = snapshot.val() || {};
+        dataList = Object.values(val);
+        currentPage = 0;
+        renderPage();
+      });
+    }
+
+    panel.appendChild(title);
+    panel.appendChild(listContainer);
+    panel.appendChild(pagination);
+
+    editBtn.parentElement.appendChild(panel);
+
+    const viewBtn = document.createElement("button");
+    viewBtn.textContent = "檢視申請人";
+    viewBtn.style.marginLeft = "6px";
+    viewBtn.onclick = () => {
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+      if(panel.style.display === "block"){
+        loadData();
+      }
+    };
+
+    editBtn.insertAdjacentElement("afterend", viewBtn);
+  }
+
+  const observer = new MutationObserver(()=>{
+    createAdminPanel();
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
+
 })();
 </script>
 
