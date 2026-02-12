@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.38-test</div>
+<div class="version-badge">v1.9.39-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.38-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.39-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.38-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.39-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.38-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.39-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.38-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.39-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.38-test : add close button to nickname/role modal === */
+/* === v1.9.39-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2646,7 +2646,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.38-test : stable quick-add (no table structure change) === */
+/* === v1.9.39-test : external right-side quick-add column === */
 (function(){
 
   function initQuickAdd(){
@@ -2656,33 +2656,35 @@ closeBtn.onclick = () => {
 
     document.querySelectorAll("table").forEach(table=>{
 
+      const wrapper = table.parentElement;
+      if(!wrapper) return;
+
+      // prevent duplicate column
+      if(wrapper.querySelector(".quick-add-column")) return;
+
+      wrapper.style.position = "relative";
+
+      const column = document.createElement("div");
+      column.className = "quick-add-column";
+      column.style.position = "absolute";
+      column.style.right = "-34px";
+      column.style.top = table.offsetTop + "px";
+      column.style.display = "flex";
+      column.style.flexDirection = "column";
+
       table.querySelectorAll("tr").forEach(row=>{
 
-        // only rows with DC checkbox (角色資料列)
         if(!row.querySelector("input[type='checkbox']")) return;
-
-        const remarkCell = row.children[3]; // 備註欄
-        if(!remarkCell) return;
-
-        if(remarkCell.querySelector(".quick-add-btn")) return;
-
-        remarkCell.style.position = "relative";
 
         const btn = document.createElement("button");
         btn.textContent = "+";
-        btn.className = "quick-add-btn";
-        btn.style.position = "absolute";
-        btn.style.right = "6px";
-        btn.style.top = "50%";
-        btn.style.transform = "translateY(-50%)";
-        btn.style.borderRadius = "50%";
         btn.style.width = "22px";
-        btn.style.height = "22px";
+        btn.style.height = row.offsetHeight + "px";
         btn.style.cursor = "pointer";
 
         btn.onclick = async () => {
 
-          if(table.dataset.locked === "1") return;
+          if(wrapper.classList.contains("locked")) return;
 
           const snap = await firebase.database()
             .ref("test/users/" + user.uid)
@@ -2702,18 +2704,21 @@ closeBtn.onclick = () => {
           roleSelect && roleSelect.dispatchEvent(new Event("change"));
         };
 
-        remarkCell.appendChild(btn);
+        column.appendChild(btn);
       });
 
+      wrapper.appendChild(column);
     });
   }
 
   function updateLockState(){
-    document.querySelectorAll("table").forEach(table=>{
-      const isLocked = table.dataset.locked === "1";
-      table.querySelectorAll(".quick-add-btn").forEach(btn=>{
-        btn.style.display = isLocked ? "none" : "inline-block";
-      });
+    document.querySelectorAll(".quick-add-column").forEach(col=>{
+      const wrapper = col.parentElement;
+      if(wrapper.classList.contains("locked")){
+        col.style.display = "none";
+      }else{
+        col.style.display = "flex";
+      }
     });
   }
 
@@ -2728,7 +2733,7 @@ closeBtn.onclick = () => {
     updateLockState();
   });
 
-  observer.observe(document.body, {subtree:true, attributes:true, attributeFilter:["data-locked"]});
+  observer.observe(document.body, {subtree:true, attributes:true, attributeFilter:["class"]});
 
 })();
 </script>
