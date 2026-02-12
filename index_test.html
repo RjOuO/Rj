@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.10-test</div>
+<div class="version-badge">v1.7.11-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-// ===== Admin System v1.7.10-test (MutationObserver Hard Bind) =====
+// ===== Admin System v1.7.11-test (MutationObserver Hard Bind) =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function applyAdminUI(user){
@@ -2205,7 +2205,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin UI Hard Override v1.7.10-test =====
+// ===== Admin UI Hard Override v1.7.11-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function forceAdminBadge() {
@@ -2256,7 +2256,7 @@ if (typeof firebase !== "undefined") {
 
 
 <script>
-// ===== Admin Nickname Insert v1.7.10-test =====
+// ===== Admin Nickname Insert v1.7.11-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function insertAdminNearNickname(user){
@@ -2297,7 +2297,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin Nickname Precise Insert v1.7.10-test =====
+// ===== Admin Nickname Precise Insert v1.7.11-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function insertAdminLabelPrecise(user){
@@ -2338,7 +2338,7 @@ if(typeof firebase !== "undefined"){
 
 
 <script>
-// ===== Admin Nickname Exact Target v1.7.10-test =====
+// ===== Admin Nickname Exact Target v1.7.11-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function applyAdminExact(user){
@@ -2369,6 +2369,46 @@ if(typeof firebase !== "undefined"){
     setTimeout(()=>applyAdminExact(user),500);
   });
 }
+</script>
+
+
+<script>
+// ===== Firestore Role System v1.7.11-test =====
+
+const db = firebase.firestore();
+let currentRole = "guest";
+
+async function loadUserRole(user) {
+
+    if (!user) {
+        currentRole = "guest";
+        return;
+    }
+
+    try {
+        const doc = await db.collection("roles").doc(user.email).get();
+        currentRole = doc.exists ? doc.data().role : "member";
+        console.log("Current Role:", currentRole);
+    } catch (error) {
+        console.error("Role load failed:", error);
+        currentRole = "member";
+    }
+
+    applyRoleUI();
+}
+
+function applyRoleUI() {
+    if (currentRole === "admin") {
+        window.isAdmin = true;
+        console.log("Admin privileges active");
+    } else {
+        window.isAdmin = false;
+    }
+}
+
+firebase.auth().onAuthStateChanged(async (user) => {
+    await loadUserRole(user);
+});
 </script>
 
 </body>
