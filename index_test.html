@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.42-test</div>
+<div class="version-badge">v1.9.43-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.42-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.43-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.42-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.43-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.42-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.43-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.42-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.43-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.42-test : add close button to nickname/role modal === */
+/* === v1.9.43-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2646,7 +2646,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.42-test : clean single quick-add implementation === */
+/* === v1.9.43-test : clean single quick-add implementation === */
 (function(){
 
   function initQuickAdd(){
@@ -2739,6 +2739,54 @@ closeBtn.onclick = () => {
   observer.observe(document.body, {subtree:true, attributes:true, attributeFilter:["class"]});
 
 })();
+</script>
+
+
+<script>
+// ===== v1.9.43-test LockManager (Firebase-driven lock control) =====
+
+function initTableLock(tableId, db) {
+    const lockedRef = firebase.database().ref("tables/" + tableId + "/locked");
+
+    lockedRef.on("value", (snapshot) => {
+        const locked = snapshot.val() === true;
+        applyLockState(tableId, locked);
+    });
+}
+
+function applyLockState(tableId, locked) {
+    const table = document.getElementById("table-" + tableId);
+    if (!table) return;
+
+    const addBtn = table.querySelector(".add-btn");
+    if (!addBtn) return;
+
+    if (locked) {
+        addBtn.style.display = "none";
+        addBtn.onclick = null;
+        addBtn.dataset.locked = "true";
+    } else {
+        addBtn.style.display = "inline-block";
+        addBtn.dataset.locked = "false";
+        addBtn.onclick = function () {
+            addMemberWithLockCheck(tableId);
+        };
+    }
+}
+
+function addMemberWithLockCheck(tableId) {
+    const lockedRef = firebase.database().ref("tables/" + tableId + "/locked");
+
+    lockedRef.once("value").then((snapshot) => {
+        if (snapshot.val() === true) {
+            return; // locked, abort
+        }
+        if (typeof performAddMember === "function") {
+            performAddMember(tableId);
+        }
+    });
+}
+// ===== End LockManager =====
 </script>
 
 </body>
