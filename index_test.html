@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.31-test</div>
+<div class="version-badge">v1.9.32-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.31-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.32-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.31-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.32-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.31-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.32-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.31-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.32-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.31-test : add close button to nickname/role modal === */
+/* === v1.9.32-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2646,7 +2646,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.31-test : add quick-add "+" button per role row === */
+/* === v1.9.32-test : add quick-add "+" button per role row === */
 (function(){
 
   function addPlusColumn(){
@@ -2661,7 +2661,17 @@ closeBtn.onclick = () => {
 
       // Add + button to each role row
       
+    
     table.querySelectorAll("tr").forEach(row=>{
+
+      // Only rows under 角色ID header (data rows only)
+      const prevHeader = row.previousElementSibling;
+      if(!row.querySelector("input")) return;
+      if(!row.closest("table").querySelector("td") ) return;
+
+      // Must contain DC checkbox to qualify as角色資料列
+      if(!row.querySelector("input[type='checkbox']")) return;
+    
 
       if(row.children.length !== 4) return;
       if(!row.querySelector("input")) return;
