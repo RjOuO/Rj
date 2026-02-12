@@ -398,21 +398,10 @@ body{
 }
 </style>
 
-
-<style>
-/* Hide account/password/login/register but keep container */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-button:not([id*="google"]):not([class*="google"]) {
-    display: none !important;
-}
-</style>
-
 </head>
 
 <body>
-<div class="version-badge">v1.9.14-test</div>
+<div class="version-badge">v1.9.15-test</div>
 
 
 
@@ -2167,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.14-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.15-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.14-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.15-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.14-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.15-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.14-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.15-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2580,6 +2569,30 @@ document.addEventListener("DOMContentLoaded", function(){
   observer.observe(document.body, { childList:true, subtree:true });
 
 })();
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+  // Remove account/email inputs
+  document.querySelectorAll('input[type="text"], input[type="email"]').forEach(el=>{
+    if(el.closest("div")) el.closest("div").remove();
+  });
+
+  // Remove password inputs
+  document.querySelectorAll('input[type="password"]').forEach(el=>{
+    if(el.closest("div")) el.closest("div").remove();
+  });
+
+  // Remove non‑Google buttons
+  document.querySelectorAll("button").forEach(btn=>{
+    if(!btn.innerText.includes("Google")){
+      btn.remove();
+    }
+  });
+
+});
 </script>
 
 </body>
