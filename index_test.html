@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.30-test</div>
+<div class="version-badge">v1.9.31-test</div>
 
 
 
@@ -2167,7 +2167,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.30-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.31-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2202,7 +2202,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.30-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.31-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2375,7 +2375,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.30-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.31-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2478,7 +2478,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.30-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.31-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2584,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.30-test : add close button to nickname/role modal === */
+/* === v1.9.31-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2646,7 +2646,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.30-test : add quick-add "+" button per role row === */
+/* === v1.9.31-test : add quick-add "+" button per role row === */
 (function(){
 
   function addPlusColumn(){
@@ -2657,17 +2657,15 @@ closeBtn.onclick = () => {
 
     document.querySelectorAll("table").forEach(table=>{
 
-      // Add header cell if not exists
-      const headerRow = table.querySelector("tr:nth-child(4)");
-      if(headerRow && !headerRow.querySelector(".plus-header")){
-        const th = document.createElement("td");
-        th.className = "plus-header";
-        th.textContent = "";
-        headerRow.appendChild(th);
-      }
+      
 
       // Add + button to each role row
-      table.querySelectorAll(".role-row").forEach(row=>{
+      
+    table.querySelectorAll("tr").forEach(row=>{
+
+      if(row.children.length !== 4) return;
+      if(!row.querySelector("input")) return;
+    
 
         if(row.querySelector(".quick-add-btn")) return;
 
