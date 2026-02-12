@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.13-test</div>
+<div class="version-badge">v1.8.14-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.13-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.14-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.13-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.8.14-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2219,9 +2219,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
     
     if(!box.querySelector(".admin-label")){
+      box.style.flexWrap = "wrap";
       // 建立 admin row
       
     if(!box.querySelector(".admin-label")){
+      box.style.flexWrap = "wrap";
       const label = document.createElement("div");
       label.className = "admin-label";
       label.textContent = "管理員";
