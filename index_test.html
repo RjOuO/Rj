@@ -398,10 +398,29 @@ body{
 }
 </style>
 
+
+<style>
+/* Hide login account/password fields only */
+input[placeholder*="帳號"],
+input[placeholder*="Email"],
+input[placeholder*="email"],
+input[placeholder*="密碼"],
+input[type="password"]{
+    display:none !important;
+}
+
+/* Hide normal login/register buttons (not Google) */
+button{
+}
+button:not([id*="google"]):not([class*="google"]){
+    display:none !important;
+}
+</style>
+
 </head>
 
 <body>
-<div class="version-badge">v1.9.17-test</div>
+<div class="version-badge">v1.9.18-test</div>
 
 
 
@@ -2156,7 +2175,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.17-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.18-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2210,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.17-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.18-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2364,7 +2383,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.17-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.18-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2467,7 +2486,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.17-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.18-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2569,33 +2588,6 @@ document.addEventListener("DOMContentLoaded", function(){
   observer.observe(document.body, { childList:true, subtree:true });
 
 })();
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-
-  // Remove specific label + input pairs only if label text matches
-  document.querySelectorAll("label").forEach(label=>{
-    const text = label.innerText.trim();
-    if(text.includes("帳號") || text.includes("Email") || text.includes("密碼") || text.includes("Password")){
-        const next = label.nextElementSibling;
-        if(next && next.tagName === "INPUT"){
-            next.remove();
-        }
-        label.remove();
-    }
-  });
-
-  // Remove buttons that are exactly 登入 or 註冊 (not Google)
-  document.querySelectorAll("button").forEach(btn=>{
-    const t = btn.innerText.trim();
-    if(t === "登入" || t === "註冊"){
-        btn.remove();
-    }
-  });
-
-});
 </script>
 
 </body>
