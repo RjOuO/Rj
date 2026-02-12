@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.3-test</div>
+<div class="version-badge">v1.9.4-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.3-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.4-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.3-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.4-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2356,140 +2356,31 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.3-test ADMIN APPLICATION VIEWER ===== */
-(function(){
 
-  function createAdminPanel(){
-
-    if(typeof window.CURRENT_ROLE === "undefined") return;
-    if(window.CURRENT_ROLE !== "admin") return;
-
-    if(document.getElementById("admin-application-panel")) return;
-
-    const editBtn = Array.from(document.querySelectorAll("button"))
-      .find(b => b.textContent.trim() === "編輯");
-
-    if(!editBtn) return;
-
-    const panel = document.createElement("div");
-    panel.id = "admin-application-panel";
-    panel.style.marginTop = "10px";
-    panel.style.padding = "10px";
-    panel.style.border = "1px solid #ccc";
-    panel.style.borderRadius = "6px";
-    panel.style.background = "#fafafa";
-    panel.style.display = "none";
-
-    const title = document.createElement("div");
-    title.textContent = "申請人列表";
-    title.style.fontWeight = "bold";
-    title.style.marginBottom = "8px";
-
-    const listContainer = document.createElement("div");
-    const pagination = document.createElement("div");
-    pagination.style.marginTop = "8px";
-
-    let currentPage = 0;
-    const pageSize = 10;
-    let dataList = [];
-
-    function renderPage(){
-      listContainer.innerHTML = "";
-      const start = currentPage * pageSize;
-      const pageData = dataList.slice(start, start + pageSize);
-
-      pageData.forEach(item => {
-        const row = document.createElement("div");
-        row.style.borderBottom = "1px solid #eee";
-        row.style.padding = "4px 0";
-        row.textContent =
-          "暱稱: " + (item.nickname || "") +
-          " | 定位: " + (item.position || "") +
-          " | 帳號: " + (item.account || "") +
-          " | 密碼: " + (item.password || "");
-        listContainer.appendChild(row);
-      });
-
-      pagination.innerHTML = "";
-
-      const prev = document.createElement("button");
-      prev.textContent = "上一頁";
-      prev.disabled = currentPage === 0;
-      prev.onclick = () => {
-        currentPage--;
-        renderPage();
-      };
-
-      const next = document.createElement("button");
-      next.textContent = "下一頁";
-      next.disabled = (start + pageSize) >= dataList.length;
-      next.style.marginLeft = "6px";
-      next.onclick = () => {
-        currentPage++;
-        renderPage();
-      };
-
-      pagination.appendChild(prev);
-      pagination.appendChild(next);
-    }
-
-    // 模擬資料來源（請替換成實際 Firebase 讀取）
-    function loadData(){
-      if(typeof firebase === "undefined" || !firebase.database) return;
-
-      firebase.database().ref("test/users").once("value").then(snapshot=>{
-        const val = snapshot.val() || {};
-        dataList = Object.values(val);
-        currentPage = 0;
-        renderPage();
-      });
-    }
-
-    panel.appendChild(title);
-    panel.appendChild(listContainer);
-    panel.appendChild(pagination);
-
-    editBtn.parentElement.appendChild(panel);
-
-    const viewBtn = document.createElement("button");
-    viewBtn.textContent = "";
-    viewBtn.style.marginLeft = "6px";
-    viewBtn.onclick = () => {
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-      if(panel.style.display === "block"){
-        loadData();
-      }
-    };
-
-    editBtn.insertAdjacentElement("afterend", viewBtn);
-  }
-
-  const observer = new MutationObserver(()=>{
-    createAdminPanel();
-  });
-
-  observer.observe(document.body, { childList:true, subtree:true });
-
-})();
-</script>
 
 
 <script>
-/* ===== v1.9.3-test ADMIN VIEW INSIDE EDIT ===== */
+
+
+
+<script>
+/* ===== v1.9.4-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
 
     if(window.CURRENT_ROLE !== "admin") return;
 
-    // 找到編輯面板（包含暱稱與定位欄位的白色區塊）
-    const nicknameInput = document.querySelector('input[placeholder*="暱稱"], input[name="nickname"]');
-    if(!nicknameInput) return;
+    // 找到「設置暱稱與定位」標題
+    const modalTitle = Array.from(document.querySelectorAll("div"))
+      .find(el => el.textContent.trim() === "設置暱稱與定位");
 
-    const editPanel = nicknameInput.closest("div");
-    if(!editPanel) return;
+    if(!modalTitle) return;
 
-    if(editPanel.querySelector("#admin-user-list")) return;
+    const modal = modalTitle.closest("div");
+    if(!modal) return;
+
+    if(modal.querySelector("#admin-user-list")) return;
 
     const container = document.createElement("div");
     container.id = "admin-user-list";
@@ -2523,9 +2414,7 @@ document.addEventListener("DOMContentLoaded", function(){
         row.style.borderBottom = "1px solid #eee";
         row.textContent =
           "暱稱: " + (user.nickname || "") +
-          " | 定位: " + (user.position || "") +
-          " | 帳號: " + (user.account || "") +
-          " | 密碼: " + (user.password || "");
+          " | 定位: " + (user.role || "");
         list.appendChild(row);
       });
 
@@ -2547,25 +2436,19 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 
     function loadUsers(){
-      if(!firebase || !firebase.database) return;
-
-      
-      firebase.database().ref().once("value").then(snapshot=>{
-        const root = snapshot.val() || {};
-        // 嘗試常見節點
-        const source = root.users || root.members || root.applications || {};
-        dataList = Object.values(source);
+      firebase.database().ref("test/users").once("value").then(snapshot=>{
+        const val = snapshot.val() || {};
+        dataList = Object.values(val);
         currentPage = 0;
         render();
       });
-    
     }
 
     container.appendChild(title);
     container.appendChild(list);
     container.appendChild(pagination);
 
-    editPanel.appendChild(container);
+    modal.appendChild(container);
 
     loadUsers();
   }
