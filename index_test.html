@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.7.3-test</div>
+<div class="version-badge">v1.7.4-test</div>
 
 
 
@@ -2155,7 +2155,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-// ===== Admin Override v1.7.3-test =====
+// ===== Admin Override v1.7.4-test =====
 const SUPER_ADMIN_EMAIL = "a93771082@gmail.com";
 
 function forceAdminOverride(user) {
@@ -2176,7 +2176,7 @@ if (typeof firebase !== "undefined") {
 
 
 <script>
-// ===== Admin Label Inject v1.7.3-test =====
+// ===== Admin Label Inject v1.7.4-test =====
 const SUPER_ADMIN_EMAIL_LABEL = "a93771082@gmail.com";
 
 function injectAdminLabel(user) {
@@ -2204,6 +2204,51 @@ function injectAdminLabel(user) {
 if (typeof firebase !== "undefined") {
   firebase.auth().onAuthStateChanged(function(user) {
     injectAdminLabel(user);
+  });
+}
+</script>
+
+
+<script>
+// ===== Admin Label Inject v1.7.4-test (robust) =====
+const SUPER_ADMIN_EMAIL_LABEL = "a93771082@gmail.com";
+
+function injectAdminLabelRobust(user) {
+  if (!user || user.email !== SUPER_ADMIN_EMAIL_LABEL) return;
+
+  // 找到「登出」按鈕
+  const logoutBtn = Array.from(document.querySelectorAll("button"))
+    .find(btn => btn.innerText && btn.innerText.includes("登出"));
+
+  if (!logoutBtn) return;
+
+  // 向上找外層容器（最多往上4層）
+  let container = logoutBtn;
+  for (let i = 0; i < 4; i++) {
+    if (!container.parentElement) break;
+    container = container.parentElement;
+  }
+
+  if (!container) return;
+
+  // 避免重複插入
+  if (container.querySelector(".admin-label")) return;
+
+  const label = document.createElement("div");
+  label.className = "admin-label";
+  label.innerText = "管理員";
+  label.style.fontSize = "13px";
+  label.style.color = "#ff4d4f";
+  label.style.fontWeight = "bold";
+  label.style.marginBottom = "6px";
+  label.style.textAlign = "center";
+
+  container.prepend(label);
+}
+
+if (typeof firebase !== "undefined") {
+  firebase.auth().onAuthStateChanged(function(user) {
+    setTimeout(() => injectAdminLabelRobust(user), 300);
   });
 }
 </script>
