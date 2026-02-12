@@ -412,7 +412,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.9.33-test</div>
+<div class="version-badge">v1.9.34-test</div>
 
 
 
@@ -2175,7 +2175,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.33-test CLEAN ROLE MODULE ===== */
+/* ===== v1.9.34-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2210,7 +2210,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.33-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.9.34-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2383,7 +2383,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.33-test ADMIN USER LIST FIX ===== */
+/* ===== v1.9.34-test ADMIN USER LIST FIX ===== */
 (function(){
 
   function injectAdminList(){
@@ -2486,7 +2486,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.9.33-test ADMIN USER LIST FIXED TARGET ===== */
+/* ===== v1.9.34-test ADMIN USER LIST FIXED TARGET ===== */
 (function(){
 
   function injectAdminList(){
@@ -2592,7 +2592,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* === v1.9.33-test : add close button to nickname/role modal === */
+/* === v1.9.34-test : add close button to nickname/role modal === */
 (function(){
 
   function injectCloseBtn(){
@@ -2654,7 +2654,7 @@ closeBtn.onclick = () => {
 
 
 <script>
-/* === v1.9.33-test : add quick-add "+" button per role row === */
+/* === v1.9.34-test : add quick-add "+" button per role row === */
 (function(){
 
   function addPlusColumn(){
@@ -2683,9 +2683,9 @@ closeBtn.onclick = () => {
       
       if(!row.querySelector("input[type='checkbox']")) return;
 
-      // If this table is locked, do not show +
-      const lockBtn = table.querySelector("button");
-      if(lockBtn && lockBtn.textContent.includes("鎖定")){
+      // If row inputs are disabled (locked state), do not show +
+      const editableInput = row.querySelector("input:not([type='checkbox']), select");
+      if(editableInput && editableInput.disabled){
         return;
       }
     
