@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.17-test</div>
+<div class="version-badge">v1.8.18-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.17-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.18-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.17-test CLEAN ROLE + UI MODULE ===== */
+/* ===== v1.8.18-test CLEAN ROLE + UI MODULE ===== */
 (function(){
 
   if(typeof firebase === "undefined" || !firebase.firestore) return;
@@ -2279,6 +2279,47 @@ document.addEventListener("DOMContentLoaded", function(){
     loadRole(user);
   });
 
+})();
+</script>
+
+
+<script>
+(function(){
+  function safeAdminInject(){
+    if(typeof window.CURRENT_ROLE === "undefined") return;
+    if(window.CURRENT_ROLE !== "admin") return;
+
+    const logoutBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => b.textContent.trim() === "登出");
+
+    if(!logoutBtn) return;
+
+    const box = logoutBtn.closest("div");
+    if(!box || box.querySelector(".admin-label")) return;
+
+    const label = document.createElement("div");
+    label.className = "admin-label";
+    label.textContent = "管理員";
+    label.style.fontSize = "12px";
+    label.style.color = "#ff4d4f";
+    label.style.fontWeight = "bold";
+    label.style.marginBottom = "6px";
+    label.style.flexBasis = "100%";
+
+    box.style.flexWrap = "wrap";
+    box.insertBefore(label, box.firstChild);
+
+    console.log("Admin UI Activated");
+  }
+
+  // Observe DOM changes to safely inject after UI renders
+  const observer = new MutationObserver(() => {
+    safeAdminInject();
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  document.addEventListener("DOMContentLoaded", safeAdminInject);
 })();
 </script>
 
