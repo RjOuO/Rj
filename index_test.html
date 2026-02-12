@@ -401,7 +401,7 @@ body{
 </head>
 
 <body>
-<div class="version-badge">v1.8.2-test</div>
+<div class="version-badge">v1.8.3-test</div>
 
 
 
@@ -2156,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.2-test CLEAN ROLE MODULE ===== */
+/* ===== v1.8.3-test CLEAN ROLE MODULE ===== */
 (function(){
   if(typeof firebase==='undefined' || !firebase.firestore) return;
 
@@ -2191,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-/* ===== v1.8.2-test ADMIN UI BINDING ===== */
+/* ===== v1.8.3-test ADMIN UI BINDING ===== */
 (function(){
 
   function applyAdminUI(){
@@ -2203,70 +2203,17 @@ document.addEventListener("DOMContentLoaded", function(){
       const label = document.createElement("div");
       label.className = "admin-label";
       label.textContent = "管理員";
+      
       label.style.fontSize = "12px";
       label.style.color = "#ff4d4f";
       label.style.fontWeight = "bold";
-      label.style.marginBottom = "4px";
-      userBox.prepend(label);
-    }
+      label.style.display = "block";
+      label.style.width = "100%";
+      label.style.textAlign = "left";
+      label.style.marginBottom = "6px";
 
-    // 2️⃣ 解鎖所有 disabled 編輯按鈕
-    document.querySelectorAll("button").forEach(btn=>{
-      if(btn.disabled){
-        btn.disabled = false;
-      }
-    });
-
-    // 3️⃣ 移除可能的鎖定狀態 class
-    document.querySelectorAll(".locked").forEach(el=>{
-      el.classList.remove("locked");
-    });
-
-    console.log("Admin UI Activated");
-  }
-
-  // 等待角色載入後再套用
-  const roleWatcher = setInterval(()=>{
-    if(window.CURRENT_ROLE){
-      applyAdminUI();
-      clearInterval(roleWatcher);
-    }
-  },300);
-
-})();
-</script>
-
-
-<script>
-/* ===== v1.8.2-test ROLE + ADMIN UI FIXED ===== */
-(function(){
-  if(typeof firebase==='undefined' || !firebase.firestore) return;
-
-  const fsdb = firebase.firestore();
-  let CURRENT_ROLE = "guest";
-  window.CURRENT_ROLE = CURRENT_ROLE;
-
-  function applyAdminUI(){
-    if(CURRENT_ROLE !== "admin") return;
-
-    // 左下登入區塊（抓包含 登出 的容器）
-    const logoutBtn = Array.from(document.querySelectorAll("button"))
-      .find(b => b.textContent.trim() === "登出");
-
-    if(!logoutBtn) return;
-
-    const box = logoutBtn.closest("div");
-    if(!box) return;
-
-    if(!box.querySelector(".admin-label")){
-      const label = document.createElement("div");
-      label.className = "admin-label";
-      label.textContent = "管理員";
-      label.style.fontSize = "12px";
-      label.style.color = "#ff4d4f";
-      label.style.fontWeight = "bold";
-      label.style.marginBottom = "4px";
       box.prepend(label);
+    
     }
 
     console.log("Admin UI Activated");
